@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#07101d">
+<title>Business Simulator — Empire</title>
+<style>
+:root{
+  --bg:#050b14;--panel:#0b1626;--panel2:#0e1d31;--panel3:#10253e;--line:#1b3858;
+  --text:#eef7ff;--muted:#8fa9c3;--accent:#69b8ff;--accent2:#8ce6d0;--good:#70e4aa;
+  --warn:#ffd66b;--bad:#ff778b;--shadow:0 16px 45px rgba(0,0,0,.30);--radius:16px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;padding:12px;background:
+radial-gradient(circle at 15% 8%,rgba(45,101,160,.25),transparent 28%),
+radial-gradient(circle at 90% 0%,rgba(39,99,116,.18),transparent 25%),linear-gradient(180deg,#07111e 0%,#050b14 100%);
+color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select{font:inherit}
+button{user-select:none}
+button:disabled{cursor:not-allowed!important;opacity:.48!important}
+.wrap{max-width:1500px;margin:0 auto}
+.topbar{position:sticky;top:8px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;background:rgba(9,20,34,.88);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.brand{font-weight:950;letter-spacing:.8px;font-size:15px}.brand span{color:var(--accent)}.clock{margin-top:2px;color:var(--muted);font-size:12px}.money{font-size:23px;font-weight:950;white-space:nowrap}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:14px;margin-top:14px}
+.sidebar{position:sticky;top:83px;height:max-content;background:rgba(9,20,34,.87);border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+.nav{display:grid;gap:6px}.nav button{width:100%;border:1px solid transparent;border-radius:11px;background:transparent;color:var(--text);padding:10px 11px;text-align:left;font-weight:800;cursor:pointer}.nav button:hover{background:#10233b;border-color:#244767}.nav button.active{background:#143452;border-color:#4b8dbd}
+.savebox{margin-top:10px;border:1px solid var(--line);border-radius:13px;padding:11px;background:#0a1524}.save-status{color:var(--good);font-size:11px}
+.page{display:none}.page.active{display:block}.hero,.panel,.card,.item{background:rgba(10,22,38,.80);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,.12)}
+.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:18px;background:linear-gradient(145deg,rgba(17,38,63,.92),rgba(8,19,32,.92))}.hero h1{margin:0 0 6px;font-size:26px}.hero p{margin:0;color:var(--muted);line-height:1.5}.hero-actions{display:flex;flex-wrap:wrap;gap:7px}
+.panel{padding:14px}.card{padding:14px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}.label{font-size:11px;color:var(--muted)}.value{margin-top:4px;font-size:20px;font-weight:950}
+.section-title{margin:19px 0 9px;font-size:15px;font-weight:900}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.list{display:grid;gap:9px}.item{padding:12px;background:#081525;box-shadow:none}.item h3{font-size:15px;margin:0 0 5px}.item p{font-size:12px;margin:4px 0;color:var(--muted);line-height:1.45}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.controls{display:flex;flex-wrap:wrap;gap:7px}.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;border:1px solid var(--line);border-radius:11px;background:#0a1626;color:var(--text);padding:10px 12px;cursor:pointer;text-decoration:none;font-weight:800;transition:.14s transform,.14s border-color,.14s background}.btn:hover{transform:translateY(-1px);border-color:#467ba3;background:#10233b}.btn.small{width:auto;padding:8px 10px;font-size:12px}.btn.primary{background:#123858;border-color:#3e83b8}.btn.good{background:#113728;border-color:#3c8a66}.btn.warn{background:#352e17;border-color:#8c7a3d}.btn.bad{background:#3f1e28;border-color:#8d4051}.btn.ghost{background:transparent}
+.filterbar{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(130px,.8fr) minmax(130px,.8fr) auto;gap:8px;margin:12px 0}.input,.select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);outline:none;background:#06111f;color:var(--text)}.input:focus,.select:focus{border-color:#4a91c4;box-shadow:0 0 0 2px rgba(74,145,196,.12)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.tag,.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;background:#0d2036;border:1px solid #21435f;color:#bad7ec;padding:4px 7px;font-size:11px}.muted{color:var(--muted)}.tiny{font-size:11px}.goodtxt{color:var(--good)}.warntxt{color:var(--warn)}.badtxt{color:var(--bad)}
+.progress{height:8px;background:#06101b;border:1px solid #18334e;border-radius:999px;overflow:hidden}.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#55a9ea,#83dfc5);transition:width .2s}
+.table{width:100%;border-collapse:collapse}.table td,.table th{font-size:12px;padding:8px;border-bottom:1px solid #17304a;text-align:left;vertical-align:top}.table th{color:#bad0e4}.empty{padding:22px;text-align:center;color:var(--muted)}
+.toastbox{position:fixed;right:16px;bottom:16px;z-index:100;display:grid;gap:8px;pointer-events:none}.toast{pointer-events:auto;min-width:260px;max-width:390px;padding:11px 13px;border-radius:12px;background:#0a1728;border:1px solid #264966;box-shadow:var(--shadow);font-size:12px;line-height:1.4}.toast.good{border-color:#367a5d}.toast.warn{border-color:#8a783b}.toast.bad{border-color:#8c3d4d}
+.modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.68)}.modal.open{display:grid}.modal-box{width:min(820px,100%);max-height:90vh;overflow:auto;padding:18px;border-radius:18px;border:1px solid var(--line);background:#0a1728;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.modal-head h2{margin:0;font-size:20px}
+.resume{background:#f9fcff;color:#152334;border-radius:10px;padding:24px}.resume h2,.resume h3{color:#152d43}.resume .rline{height:1px;background:#cad5df;margin:12px 0}.resume p{line-height:1.5}.resume .muted{color:#5b6f80}
+.badge-ok{color:#99f2c6}.badge-bad{color:#ff9eab}
+.kpi-note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.45}.sticky-actions{position:sticky;bottom:8px;margin-top:12px;padding:8px;border:1px solid var(--line);border-radius:13px;background:rgba(7,16,29,.92);backdrop-filter:blur(12px);z-index:4}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:static}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.two,.three{grid-template-columns:1fr}.filterbar{grid-template-columns:1fr 1fr}.topbar{position:static}}
+@media(max-width:650px){body{padding:8px}.cards{grid-template-columns:1fr}.filterbar{grid-template-columns:1fr}.hero{flex-direction:column}.money{font-size:19px}.row{align-items:flex-start;flex-direction:column}.row > :last-child{align-self:flex-start}.toastbox{left:8px;right:8px;bottom:8px}.toast{max-width:none;min-width:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div>
+      <div class="brand">BUSINESS <span>SIMULATOR</span></div>
+      <div id="clock" class="clock">Age 18 · Little Rock, AR · Month 1, Day 1 · 08:00</div>
+    </div>
+    <div id="moneyTop" class="money">$100.00</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav id="nav" class="nav" aria-label="Main navigation"></nav>
+      <div class="savebox">
+        <div class="tiny muted">Autosave</div>
+        <div id="saveStatus" class="save-status">Saved</div>
+      </div>
+    </aside>
+
+    <main>
+      <section id="page-dashboard" class="page active">
+        <div class="hero">
+          <div>
+            <h1>Build your life. Build your empire.</h1>
+            <p>Start at 18 with $100. Work by the hour, study, build businesses, invest, move, buy property, and climb toward executive leadership.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn primary small" data-action="advance-hour">+1 Hour</button>
+            <button class="btn good small" data-action="work-hour">Work 1 Hour</button>
+            <button class="btn warn small" data-action="work-harder">Work Harder</button>
+          </div>
+        </div>
+        <div id="statsCards" class="cards"></div>
+        <div class="two" style="margin-top:12px">
+          <div class="panel"><div class="section-title" style="margin-top:0">Current career</div><div id="careerSummary"></div></div>
+          <div class="panel"><div class="section-title" style="margin-top:0">Life snapshot</div><div id="lifeSummary"></div></div>
+        </div>
+        <div class="panel" style="margin-top:12px"><div class="section-title" style="margin-top:0">Recent activity</div><div id="activity"></div></div>
+      </section>
+
+      <section id="page-jobs" class="page">
+        <div class="hero"><div><h1>Jobs</h1><p>One primary job at a time. Search real-world companies and role families. Side gigs remain available separately.</p></div></div>
+        <div class="filterbar">
+          <input id="jobSearch" class="input" placeholder="Search jobs, companies, fields..." autocomplete="off">
+          <select id="jobField" class="select"></select>
+          <select id="jobEdu" class="select"><option value="all">Any education</option><option value="hs">High school</option><option value="bachelor">Bachelor / college</option><option value="grad">Graduate / professional</option></select>
+          <button class="btn small" data-action="refresh-jobs">Refresh</button>
+        </div>
+        <div class="panel">
+          <div class="row"><div><b id="jobCount">0</b> listings matched</div><span class="pill">Primary job slots: 1</span></div>
+          <div id="jobList" class="list" style="margin-top:10px"></div>
+          <div id="jobPages" class="controls" style="margin-top:10px"></div>
+        </div>
+        <div class="panel" style="margin-top:12px">
+          <div class="row"><div><b>Side gigs</b><div class="muted tiny">Flexible work that does not replace your primary job.</div></div><span class="pill">Max combined workday: 12h</span></div>
+          <div id="sideGigList" class="list" style="margin-top:10px"></div>
+        </div>
+      </section>
+
+      <section id="page-college" class="page">
+        <div class="hero"><div><h1>College & education</h1><p>Admission, tuition, scholarships, student loans, work permissions, majors, minors, and professional-school paths all matter.</p></div></div>
+        <div class="two" style="margin-top:12px">
+          <div class="panel"><div class="section-title" style="margin-top:0">Your education</div><div id="eduSummary"></div></div>
+          <div class="panel"><div class="section-title" style="margin-top:0">Current program</div><div id="degreeSummary"></div></div>
+        </div>
+        <div class="filterbar">
+          <input id="collegeSearch" class="input" placeholder="Search colleges..." autocomplete="off">
+          <select id="collegeType" class="select"><option value="all">All types</option><option value="community">Community</option><option value="public">Public</option><option value="private">Private</option><option value="elite">Elite</option></select>
+        </div>
+        <div id="collegeList" class="list"></div>
+      </section>
+
+      <section id="page-businesses" class="page">
+        <div class="hero"><div><h1>Businesses</h1><p>Open as many businesses as you can afford. Bigger tiers need much more capital but can produce much larger cash flow.</p></div></div>
+        <div class="filterbar">
+          <input id="bizSearch" class="input" placeholder="Search business types..." autocomplete="off">
+          <select id="bizIndustry" class="select"></select>
+          <select id="bizSort" class="select"><option value="cost">Lowest startup cost</option><option value="profit">Best estimated hourly profit</option><option value="risk">Lowest risk</option></select>
+          <button class="btn small" data-action="refresh-businesses">Refresh</button>
+        </div>
+        <div class="two">
+          <div class="panel"><div class="section-title" style="margin-top:0">Your companies</div><div id="ownedBusinesses"></div></div>
+          <div class="panel"><div class="section-title" style="margin-top:0">Market</div><div id="businessList" class="list"></div></div>
+        </div>
+      </section>
+
+      <section id="page-money" class="page">
+        <div class="hero"><div><h1>Money center</h1><p>Checking is liquid. Savings earns interest. Retirement accounts and investments grow over simulated time.</p></div></div>
+        <div id="moneyCards" class="cards"></div>
+        <div class="three" style="margin-top:12px">
+          <div class="panel"><h3>Savings</h3><p class="muted">4.2% APY in-game.</p><input id="saveAmt" class="input" type="number" min="0.01" step="0.01" placeholder="Amount"><div class="controls" style="margin-top:8px"><button class="btn small" data-money="toSavings">Deposit</button><button class="btn small" data-money="fromSavings">Withdraw</button></div></div>
+          <div class="panel"><h3>401(k)</h3><p class="muted">Long-term retirement account. Employer matching can apply to eligible jobs.</p><input id="retAmt" class="input" type="number" min="0.01" step="0.01" placeholder="Amount"><div class="controls" style="margin-top:8px"><button class="btn small" data-money="toRet">Contribute</button><button class="btn small" data-money="fromRet">Withdraw</button></div></div>
+          <div class="panel"><h3>IRA</h3><p class="muted">Long-term account with 5.2% APY in-game.</p><input id="iraAmt" class="input" type="number" min="0.01" step="0.01" placeholder="Amount"><div class="controls" style="margin-top:8px"><button class="btn small" data-money="toIra">Contribute</button><button class="btn small" data-money="fromIra">Withdraw</button></div></div>
+        </div>
+        <div class="panel" style="margin-top:12px"><h3>Investments</h3><p class="muted">Monthly market returns can be positive or negative.</p><input id="invAmt" class="input" type="number" min="0.01" step="0.01" placeholder="Amount"><div class="controls" style="margin-top:8px"><button class="btn small" data-money="toInv">Invest</button><button class="btn small" data-money="fromInv">Sell</button></div></div>
+        <div id="loanPanelMount" style="margin-top:12px"></div>
+      </section>
+
+      <section id="page-housing" class="page">
+        <div class="hero"><div><h1>Housing & real estate</h1><p>Rent a place, buy a home, or build a rental portfolio. Moving has costs and your residence follows its own lease or ownership state.</p></div></div>
+        <div class="panel"><div class="section-title" style="margin-top:0">Current home</div><div id="homeSummary"></div></div>
+        <div class="filterbar">
+          <input id="homeSearch" class="input" placeholder="Search homes..." autocomplete="off">
+          <select id="homeType" class="select"><option value="all">All types</option><option value="rent">Rentals</option><option value="buy">Homes for sale</option></select>
+          <select id="homeSort" class="select"><option value="cost">Lowest cost</option><option value="quality">Best quality</option></select>
+        </div>
+        <div id="housingList" class="list"></div>
+        <div class="panel" style="margin-top:12px"><div class="section-title" style="margin-top:0">Rental properties you own</div><div id="rentalList"></div></div>
+      </section>
+
+      <section id="page-city" class="page">
+        <div class="hero"><div><h1>Move & compare cities</h1><p>Taxes, salaries, housing, and business demand change by city. Moving costs money and can break or transfer a lease.</p></div></div>
+        <div id="cityList" class="list" style="margin-top:12px"></div>
+      </section>
+
+      <section id="page-resume" class="page">
+        <div class="hero"><div><h1>Auto Resume</h1><p>Your resume updates from your education, experience, current job, promotions, skills, businesses, and certifications.</p></div><div class="hero-actions"><button class="btn primary small" data-action="edit-resume">Edit name</button><button class="btn small" data-action="print-resume">Print / Save PDF</button></div></div>
+        <div id="resume" style="margin-top:12px"></div>
+      </section>
+
+      <section id="page-life" class="page">
+        <div class="hero"><div><h1>Life & settings</h1><p>Save, export a backup, import a backup, run diagnostics, or reset the local save.</p></div></div>
+        <div class="two" style="margin-top:12px">
+          <div class="panel"><h3>Character</h3><div id="characterSummary"></div></div>
+          <div class="panel"><h3>Game controls</h3><div class="controls"><button class="btn small" data-action="save">Save now</button><button class="btn small" data-action="diagnostics">Run 20-pass diagnostics</button><button class="btn small" data-action="export">Export save</button><button class="btn small" data-action="import">Import save</button><button class="btn small bad" data-action="reset">Reset game</button></div><input id="importFile" type="file" accept="application/json" hidden><p class="muted tiny" style="margin-top:10px">Autosave uses localStorage. Export creates a portable JSON backup. Import only accepts saves created by this game.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h2 id="modalTitle">Dialog</h2><button class="btn small ghost" data-action="close-modal">Close</button></div>
+    <div id="modalBody" style="margin-top:12px"></div>
+  </div>
+</div>
+<div id="toastbox" class="toastbox" aria-live="polite" aria-atomic="true"></div>
+<script>
+'use strict';
+(() => {
+  const APP_VERSION = 'BS-2.0.0';
+  const SAVE_KEY = 'businessSimulator.save.v20';
+  const SAVE_SCHEMA = 20;
+  const HOUR_MS = 3600000;
+  const MAX_WORK_HOURS = 12;
+  const OVERTIME_START = 8;
+  const HARDER_COOLDOWN = 6;
+  const JOB_PAGE_SIZE = 40;
+  const MONEY_EPSILON = 0.005;
+
+  const $ = (id) => document.getElementById(id);
+  const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const safeNumber = (v, fallback=0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
+  const finite = (v, fallback=0) => Number.isFinite(v) ? v : fallback;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const round2 = (v) => Math.round((finite(v) + Number.EPSILON) * 100) / 100;
+  const money = (v) => `$${round2(finite(v)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const number = (v) => Math.round(finite(v)).toLocaleString('en-US');
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const capText = (s, max=100) => String(s ?? '').replace(/[<>]/g,'').slice(0,max);
+  const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const uid = (prefix='id') => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;
+
+  const CITIES = [
+    {id:'little-rock',name:'Little Rock, AR',tax:.042,econ:1.00,salary:1.00,biz:1.00,housing:1.00,moveBase:550,desc:'Lower cost of living with regional retail, healthcare, government, and services.'},
+    {id:'houston',name:'Houston, TX',tax:0,econ:1.08,salary:1.04,biz:1.10,housing:1.03,moveBase:850,desc:'No state personal income tax in this game model; major energy, medical, logistics, and trade market.'},
+    {id:'dallas',name:'Dallas, TX',tax:0,econ:1.13,salary:1.09,biz:1.16,housing:1.17,moveBase:900,desc:'Large corporate, finance, logistics, technology, and retail market.'},
+    {id:'miami',name:'Miami, FL',tax:0,econ:1.10,salary:1.01,biz:1.14,housing:1.30,moveBase:950,desc:'Tourism, trade, finance, real estate, and hospitality-heavy economy.'},
+    {id:'nyc',name:'New York, NY',tax:.109,econ:1.25,salary:1.31,biz:1.27,housing:2.55,moveBase:1600,desc:'Huge opportunity and high wages with high taxes and housing costs.'},
+    {id:'los-angeles',name:'Los Angeles, CA',tax:.105,econ:1.20,salary:1.21,biz:1.27,housing:2.35,moveBase:1500,desc:'Entertainment, healthcare, technology, trade, and massive service economy.'},
+    {id:'seattle',name:'Seattle, WA',tax:0,econ:1.18,salary:1.28,biz:1.21,housing:2.05,moveBase:1400,desc:'No state personal income tax in this game model; technology and aerospace are major sectors.'},
+    {id:'chicago',name:'Chicago, IL',tax:.0495,econ:1.09,salary:1.09,biz:1.11,housing:1.40,moveBase:1050,desc:'Transportation, finance, healthcare, food, manufacturing, and professional services.'},
+    {id:'dubai',name:'Dubai, UAE',tax:0,econ:1.22,salary:1.16,biz:1.25,housing:1.90,moveBase:1800,desc:'No personal income tax in the game model; strong trade, tourism, logistics, property, and luxury demand.'},
+    {id:'singapore',name:'Singapore',tax:.08,econ:1.22,salary:1.24,biz:1.23,housing:2.00,moveBase:1750,desc:'Finance, logistics, technology, healthcare, and trade hub.'},
+    {id:'london',name:'London, UK',tax:.20,econ:1.18,salary:1.20,biz:1.17,housing:2.30,moveBase:1700,desc:'Global finance, technology, media, healthcare, and professional-services center.'},
+    {id:'toronto',name:'Toronto, Canada',tax:.16,econ:1.10,salary:1.08,biz:1.10,housing:1.75,moveBase:1450,desc:'Finance, healthcare, technology, services, and real estate.'}
+  ];
+
+  const COMPANY_ROOTS = [
+    'Walmart','Target','Kroger','Meijer','Costco','Amazon','Best Buy','Home Depot',"Lowe's","McDonald's",'Chick-fil-A','Buffalo Wild Wings','Starbucks','Dunkin','Chipotle','Subway','Panera','CVS Health','Walgreens','Kaiser Permanente','Mayo Clinic','Cleveland Clinic','Ford','Toyota','Honda','Tesla','Boeing','Lockheed Martin','Delta Air Lines','United Airlines','FedEx','UPS','Marriott','Hilton','Hyatt','JPMorgan Chase','Bank of America','Wells Fargo','Goldman Sachs','Morgan Stanley','Deloitte','PwC','EY','KPMG','Microsoft','Apple','Google','Meta','Netflix','Adobe','IBM','Oracle','Intel','NVIDIA','Cisco','Salesforce','Nike','Adidas','Coca-Cola','PepsiCo','Procter & Gamble','Johnson & Johnson','Pfizer','Merck','Accenture','Verizon','AT&T','T-Mobile','Comcast','Disney','Warner Bros. Discovery','HomeGoods','Ross','TJ Maxx',"Macy's",'Nordstrom','Penske','Sherwin-Williams','Ace Hardware','Tractor Supply','PetSmart','Petco',"Domino's",'Pizza Hut','KFC','Popeyes',"Wendy's",'Burger King','Taco Bell','Sonic','Five Guys','Jersey Mike’s','Dollar General','Dollar Tree','7-Eleven','Circle K','Whole Foods',"Trader Joe's",'Publix','ALDI','H-E-B','Safeway','Albertsons','Instacart','DoorDash','Uber','Lyft','Marshalls','Ulta Beauty','Sephora','State Farm','Allstate','Nationwide','USPS','UPS Store','FedEx Office','Sherwin-Williams','Ryder','Enterprise','Avis','Hertz','Airbnb','Expedia','Booking Holdings','Home Depot Pro','Grainger','Sysco','US Foods','Tyson Foods','General Motors','BMW','Mercedes-Benz','Volkswagen','Hyundai','Rivian','SpaceX','Northrop Grumman','Raytheon','Honeywell','Siemens','Johnson Controls','GE Aerospace','Emerson','3M','Thermo Fisher Scientific','Illumina','Abbott','UnitedHealth Group','HCA Healthcare','Tenet Healthcare','Baptist Health','St. Jude','Mayo Clinic Network','Berkshire Hathaway','BlackRock','Vanguard','Fidelity','Charles Schwab','Visa','Mastercard','PayPal','Stripe','Shopify','HubSpot','Atlassian','ServiceNow','Dell','HP','Lenovo','TikTok','Spotify','EA','Epic Games','Unity','Roblox','Autodesk','Indeed','LinkedIn','Coursera','Pearson','Cintas','ADP','Manpower','Randstad','KPMG Advisory','Local Family Dental','Local Coffee Roasters','Local Pizza Group'
+  ];
+
+  const COMPANY_SUFFIXES = ['Downtown','Northside','Market Center','Distribution Hub','Regional Office','Medical Center','Airport','Mall','University District','Operations Hub','Customer Care Center','Fulfillment Center'];
+
+  const CAREER_ROWS = [
+    ['Retail','Cashier',11,'hs',0],['Retail','Cart Pusher',12,'hs',0],['Retail','Stock Associate',14,'hs',0],['Retail','Fulfillment Associate',16,'hs',0],['Retail','Department Lead',18,'hs',1],['Retail','Assistant Store Manager',24,'bachelor',2],['Retail','Store Manager',31,'bachelor',4],['Retail','District Manager',43,'bachelor',7],['Retail','Regional Vice President',78,'bachelor',13],
+    ['Food','Crew Member',11,'hs',0],['Food','Cashier / Front Counter',12,'hs',0],['Food','Waiter',15,'hs',0],['Food','Barista',14,'hs',0],['Food','Cook',15,'hs',0],['Food','Shift Supervisor',19,'hs',1],['Food','Restaurant Manager',29,'bachelor',3],['Food','District Manager',43,'bachelor',7],['Food','Franchise Operations Director',68,'bachelor',12],
+    ['Warehouse','Picker / Packer',16,'hs',0],['Warehouse','Forklift Operator',20,'hs',1],['Warehouse','Warehouse Lead',24,'hs',2],['Warehouse','Operations Supervisor',31,'bachelor',3],['Warehouse','Distribution Center Manager',46,'bachelor',7],['Warehouse','Senior Operations Director',72,'bachelor',12],
+    ['Delivery','Delivery Driver',19,'hs',0],['Delivery','Courier',18,'hs',0],['Delivery','Route Supervisor',27,'hs',2],['Delivery','Logistics Manager',38,'bachelor',5],['Delivery','Director of Logistics',58,'bachelor',10],['Delivery','VP Supply Chain',102,'bachelor',15],
+    ['Healthcare','Medical Assistant',22,'bachelor',0],['Healthcare','Registered Nurse',39,'bachelor',2],['Healthcare','Nurse Manager',52,'bachelor',6],['Healthcare','Nurse Practitioner',62,'grad',6],['Healthcare','Physician Assistant',66,'grad',5],['Healthcare','Physician',96,'professional',8],['Healthcare','Surgeon',150,'professional',10],['Healthcare','Neurosurgeon',220,'professional',12],['Healthcare','Dentist',86,'professional',6],['Healthcare','Pharmacist',66,'professional',6],['Healthcare','Physical Therapist',45,'professional',5],['Healthcare','Radiologic Technologist',33,'bachelor',2],['Healthcare','Medical Lab Scientist',34,'bachelor',2],['Healthcare','Hospital Administrator',55,'bachelor',8],['Healthcare','Chief Medical Officer',185,'professional',18],
+    ['Technology','IT Support Specialist',28,'bachelor',0],['Technology','Web Developer',40,'bachelor',1],['Technology','Software Engineer',62,'bachelor',2],['Technology','Data Analyst',46,'bachelor',1],['Technology','Data Scientist',72,'bachelor',4],['Technology','Cybersecurity Analyst',58,'bachelor',3],['Technology','Cloud Engineer',68,'bachelor',3],['Technology','Machine Learning Engineer',79,'bachelor',4],['Technology','Product Manager',66,'bachelor',5],['Technology','Engineering Manager',82,'bachelor',7],['Technology','Director of Engineering',105,'bachelor',10],['Technology','VP of Engineering',135,'bachelor',14],['Technology','Chief Technology Officer',180,'bachelor',20],
+    ['Finance','Bank Teller',18,'hs',0],['Finance','Loan Officer',28,'bachelor',1],['Finance','Financial Analyst',42,'bachelor',1],['Finance','Accountant',38,'bachelor',1],['Finance','CPA',49,'bachelor',3],['Finance','Investment Analyst',52,'bachelor',2],['Finance','Financial Advisor',48,'bachelor',2],['Finance','Investment Banker',75,'bachelor',2],['Finance','Portfolio Manager',90,'bachelor',8],['Finance','Bank Branch Manager',44,'bachelor',6],['Finance','Treasury Manager',77,'bachelor',8],['Finance','Chief Financial Officer',120,'bachelor',15],
+    ['Legal','Legal Assistant',24,'bachelor',0],['Legal','Paralegal',31,'bachelor',1],['Legal','Lawyer',68,'professional',7],['Legal','Corporate Lawyer',82,'professional',9],['Legal','Partner',135,'professional',15],['Legal','General Counsel',125,'professional',14],
+    ['Engineering','Mechanical Engineer',51,'bachelor',2],['Engineering','Civil Engineer',48,'bachelor',2],['Engineering','Electrical Engineer',56,'bachelor',2],['Engineering','Aerospace Engineer',64,'bachelor',3],['Engineering','Chemical Engineer',58,'bachelor',2],['Engineering','Project Engineer',52,'bachelor',2],['Engineering','Engineering Manager',79,'bachelor',7],['Engineering','VP Engineering',128,'bachelor',14],['Engineering','Chief Engineering Officer',172,'bachelor',20],
+    ['Science','Laboratory Technician',25,'bachelor',1],['Science','Research Assistant',23,'bachelor',0],['Science','Research Scientist',52,'grad',5],['Science','Biologist',39,'bachelor',2],['Science','Chemist',43,'bachelor',2],['Science','Neuroscientist',61,'grad',7],['Science','Principal Scientist',92,'grad',12],['Science','Research Institute Director',128,'grad',18],
+    ['Education','Teacher',31,'bachelor',0],['Education','School Counselor',33,'bachelor',2],['Education','Principal',49,'bachelor',7],['Education','District Superintendent',72,'bachelor',12],['Education','University Dean',102,'grad',15],
+    ['Media','Content Creator',16,'hs',0],['Media','Graphic Designer',29,'bachelor',0],['Media','Video Editor',31,'bachelor',0],['Media','Marketing Specialist',34,'bachelor',1],['Media','Marketing Manager',53,'bachelor',5],['Media','Creative Director',72,'bachelor',8],['Media','Producer',59,'bachelor',5],['Media','Studio Executive',118,'bachelor',14],
+    ['Trades','Electrician Apprentice',18,'hs',0],['Trades','Electrician',33,'hs',4],['Trades','Plumber',34,'hs',4],['Trades','HVAC Technician',31,'hs',3],['Trades','Carpenter',29,'hs',2],['Trades','Welder',27,'hs',2],['Trades','Construction Foreman',38,'hs',7],['Trades','Construction Manager',52,'bachelor',8],['Trades','General Contractor',73,'bachelor',12],
+    ['Aviation','Flight Attendant',34,'hs',0],['Aviation','Aircraft Mechanic',42,'bachelor',2],['Aviation','Commercial Pilot',72,'bachelor',2],['Aviation','Airline Captain',125,'bachelor',10],['Aviation','Airline Operations Director',110,'bachelor',14],
+    ['Public Service','Police Officer',34,'bachelor',0],['Public Service','Firefighter',31,'hs',0],['Public Service','City Planner',43,'bachelor',2],['Public Service','Public Administrator',54,'bachelor',7],['Public Service','Agency Director',89,'bachelor',13],
+    ['Sales','Sales Associate',18,'hs',0],['Sales','Sales Representative',31,'hs',1],['Sales','Account Executive',44,'bachelor',2],['Sales','Sales Manager',61,'bachelor',6],['Sales','VP of Sales',118,'bachelor',13],['Sales','Chief Revenue Officer',166,'bachelor',20],
+    ['Operations','Operations Manager',66,'bachelor',8],['Operations','General Manager',83,'bachelor',11],['Operations','Chief Operating Officer',132,'bachelor',16],['Operations','Chief Executive Officer',180,'bachelor',20],['Operations','President',235,'bachelor',28],['Operations','Chairperson',300,'bachelor',35]
+  ];
+
+  const CAREERS = CAREER_ROWS.map((r,i) => ({id:`career-${i}`,field:r[0],title:r[1],hourly:r[2],edu:r[3],exp:r[4],track:r[0]}));
+  const CAREER_BY_ID = Object.fromEntries(CAREERS.map(c => [c.id,c]));
+
+  const MAJOR_ROOTS = [
+    'Biology','Chemistry','Biochemistry','Neuroscience','Molecular Biology','Cell Biology','Microbiology','Genetics','Biomedical Sciences','Public Health','Psychology','Computer Science','Software Engineering','Information Systems','Data Science','Cybersecurity','Mechanical Engineering','Electrical Engineering','Civil Engineering','Chemical Engineering','Aerospace Engineering','Environmental Engineering','Business Administration','Finance','Accounting','Economics','Marketing','Management','Entrepreneurship','Supply Chain Management','Hospitality Management','Communications','Journalism','Graphic Design','Education','Elementary Education','Secondary Education','Political Science','International Relations','Sociology','Criminal Justice','Mathematics','Statistics','Physics','Astronomy','English','History','Philosophy','Architecture','Construction Management','Nursing','Health Administration','Kinesiology','Nutrition','Social Work','Film','Music Business','Real Estate','Agriculture','Animal Science','Food Science','Information Technology','AI Engineering','Robotics','Game Development','Human Resources','Advertising','Operations Management','Aviation','Marine Science','Accounting Information Systems','Actuarial Science','Supply Chain Analytics','Sports Management','Architecture Technology','Dental Hygiene','Radiation Therapy','Respiratory Care','Occupational Therapy','Speech-Language Pathology','Emergency Management','Environmental Science','Materials Science','Geology','Meteorology','Astrophysics','Statistics and Data Science','Public Policy','Urban Planning','International Business','Entrepreneurial Finance','FinTech','Marketing Analytics','Business Analytics','Product Design','UX Design','Game Programming','Mobile Development','Cloud Computing','Network Engineering','Database Systems','Bioinformatics','Computational Biology','Immunology','Pharmacology','Toxicology','Epidemiology','Health Informatics','Genomic Medicine','Neurobiology','Behavioral Neuroscience','Cognitive Science','Medical Physics','Biomedical Engineering','Chemical Biology'
+  ];
+  const MINOR_ROOTS = [...MAJOR_ROOTS,'Entrepreneurship','Leadership','Spanish','Arabic','French','Public Speaking','Innovation','Business Analytics','Personal Finance','Digital Media','Pre-Law','Statistics','Ethics','Artificial Intelligence','Game Design','Real Estate Investing','Negotiation','Project Management','Professional Writing','Sales','Retail Management','Restaurant Management','Investing','Economics','Entrepreneurship Law'];
+  const MAJOR_FOCI = ['Analytics','Management','Research','Design','Technology','Leadership','Policy','Applied Practice','Entrepreneurship','Sustainability','Innovation','Clinical Studies','Theory','Operations','Data Systems','Professional Practice','Simulation','Modeling','Strategy','Global Studies'];
+  const MINOR_FOCI = ['Professional Practice','Analytics','Business','Research','Technology','Leadership','Design','Communication','Entrepreneurship','Public Service','Innovation','Data','Ethics','Global Studies','Management','Strategy','Applied Practice'];
+  const ALL_MAJORS = Array.from(new Set([...MAJOR_ROOTS,...MAJOR_ROOTS.flatMap(x=>MAJOR_FOCI.map(f=>`${x} — ${f}`))]));
+  const ALL_MINORS = Array.from(new Set([...MINOR_ROOTS,...MINOR_ROOTS.flatMap(x=>MINOR_FOCI.map(f=>`${x} — ${f}`))]));
+
+  const COLLEGES = [
+    ['community','River County Community College',6500,.36,.92,true,2],['community','North Metro Community College',7200,.41,.95,true,2],['public','Arkansas State University',11000,.40,1.03,true,4],['public','University of Arkansas',18000,.46,1.10,true,4],['public','University of Texas at Dallas',23000,.58,1.16,true,4],['public','University of Central Florida',17000,.44,1.06,true,4],['public','Arizona State University',16500,.50,1.05,true,4],['public','Penn State',20500,.62,1.12,false,4],['public','Ohio State University',19500,.60,1.10,true,4],['public','University of Michigan',31000,.75,1.28,false,4],['private','Baylor University',31000,.68,1.16,false,4],['private','Rice University',36000,.86,1.33,false,4],['private','Boston University',39000,.74,1.25,false,4],['private','Northwestern University',43000,.88,1.36,false,4],['private','Duke University',44000,.90,1.42,false,4],['elite','Harvard University',42000,.94,1.50,false,4],['elite','Stanford University',42000,.95,1.52,false,4],['elite','MIT',43000,.96,1.54,false,4],['elite','Princeton University',41000,.97,1.56,false,4],['elite','Yale University',41000,.96,1.50,false,4],['elite','University of Pennsylvania',41500,.91,1.46,false,4]
+  ].map((r,i)=>({id:`college-${i}`,type:r[0],name:r[1],tuition:r[2],accept:r[3],prestige:r[4],work:r[5],years:r[6],loans:(r[0]==='community'||r[0]==='public')&&!['Penn State','University of Michigan'].includes(r[1])}));
+
+  const GRAD_PROGRAMS = [
+    {id:'grad-masters',name:'Master’s Degree',stage:'grad',years:2,tuitionFactor:1.25,requiredMajor:false},
+    {id:'law-school',name:'Juris Doctor (Law School)',stage:'professional',years:3,tuitionFactor:1.8,requiredMajor:false},
+    {id:'medical-school',name:'Medical School (MD)',stage:'professional',years:4,tuitionFactor:2.4,requiredMajor:true},
+    {id:'dental-school',name:'Dental School (DDS/DMD)',stage:'professional',years:4,tuitionFactor:2.2,requiredMajor:true},
+    {id:'pharmacy-school',name:'Pharmacy School (PharmD)',stage:'professional',years:4,tuitionFactor:1.9,requiredMajor:true}
+  ];
+
+  const BUSINESS_BASE = [
+    ['Micro Cleaning Service','Services',100,9,.08,1],['Lawn Care Route','Services',250,15,.12,1],['Dog Walking Service','Services',180,10,.10,1],['Mobile Car Wash','Automotive',650,35,.14,1],['Handyman Service','Trades',900,43,.15,1],['Junk Removal','Services',1400,75,.20,1],['Dumpster Rental Company','Waste',8500,320,.23,1],['Vending Machine Route','Retail',1200,46,.12,1],['Food Truck','Food',18000,105,.24,2],['Coffee Kiosk','Food',28000,145,.22,2],['Small Restaurant','Food',65000,310,.26,3],['Fast Casual Restaurant','Food',110000,520,.28,4],['Franchise Restaurant','Food',275000,1200,.25,5],['Grocery Store','Retail',450000,1900,.21,7],['Convenience Store','Retail',165000,680,.20,4],['Car Wash','Automotive',260000,1150,.18,5],['Auto Repair Shop','Automotive',190000,780,.17,4],['Construction Company','Construction',140000,760,.22,4],['Delivery Company','Logistics',90000,450,.19,3],['Trucking Company','Logistics',250000,1200,.18,5],['Software Startup','Technology',25000,250,.45,2],['SaaS Company','Technology',150000,1250,.40,5],['Cybersecurity Firm','Technology',240000,1700,.35,6],['Digital Marketing Agency','Marketing',15000,210,.30,2],['Accounting Firm','Professional',80000,440,.20,4],['Law Firm','Professional',125000,650,.17,7],['Medical Clinic','Healthcare',375000,1850,.13,8],['Dental Practice','Healthcare',450000,2250,.14,8],['Physical Therapy Clinic','Healthcare',250000,1100,.15,7],['Pharmacy','Healthcare',600000,2200,.12,8],['Property Management Company','Real Estate',110000,580,.20,5],['Apartment Building','Real Estate',750000,2500,.10,10],['Office Building','Real Estate',1500000,5200,.09,12],['Warehouse Portfolio','Real Estate',1800000,5900,.10,12],['Bank','Finance',5000000,14500,.06,20],['Credit Union','Finance',1200000,4500,.08,12],['Investment Firm','Finance',2500000,8500,.09,15],['Insurance Brokerage','Finance',650000,2200,.11,8],['Private Equity Firm','Finance',10000000,30000,.07,25],['Cyber Café','Technology',18000,180,.28,2],['B2B Call Center','Professional',65000,420,.20,4],['Storage Facility','Real Estate',900000,3100,.11,10],['Hotel','Hospitality',1500000,5200,.12,13],['Motel','Hospitality',500000,2100,.13,8],['Event Venue','Hospitality',450000,1950,.18,6],['Gym','Fitness',250000,1050,.19,5],['Childcare Center','Education',190000,880,.15,6],['Tutoring Center','Education',70000,420,.24,3],['Private School','Education',1000000,4300,.17,12],['Daycare Franchise','Education',350000,1450,.16,8]
+  ];
+  const BUSINESS_SCALES = [['Local',.72,.76,0],['Premium',1.45,1.32,.015],['Regional',4.2,3.1,.02],['Franchise Network',10,6.5,.025],['National Chain',28,16,.03],['International Group',80,42,.035]];
+  const BUSINESSES = BUSINESS_BASE.flatMap((r,bi) => BUSINESS_SCALES.map((s,si)=>({id:`biz-${bi}-${si}`,name:`${s[0]} ${r[0]}`,industry:r[1],cost:Math.max(50,Math.round(r[2]*s[1])),hourly:Math.max(1,Math.round(r[3]*s[2])),margin:clamp(r[4]+s[3],.04,.62),tier:r[5]+si+1,staff:Math.max(1,Math.ceil((r[5]+si)/2))})));
+
+  const HOME_BASE = [
+    ['Studio Apartment','rent',450,0,1,1],['1BR Apartment','rent',750,0,1.4,1],['2BR Apartment','rent',1050,0,1.9,2],['Townhome Rental','rent',1450,0,2.5,3],['Luxury Apartment','rent',2800,0,4.5,4],['Starter Home','buy',0,145000,3,2],['Family Home','buy',0,280000,4.5,3],['Large Family Home','buy',0,475000,6,4],['Suburban Executive Home','buy',0,800000,8,5],['Luxury Estate','buy',0,2200000,12,7],['Penthouse','buy',0,3500000,14,4]
+  ];
+  const HOME_PREFIXES = ['Downtown','Suburban','Urban','Riverside','Mountain View','Lakeside','Gated','Smart','Contemporary','Historic','Garden','Waterfront','Golf Community','High-Rise','Modern Farmhouse','Brick','Energy Efficient','Family','Investor','Corporate','University','Transit-Oriented','Arts District','Tech District','Medical District'];
+  const HOMES = HOME_BASE.flatMap((r,i)=>HOME_PREFIXES.map((p,j)=>{const scale=1+j*.09+i*.025;return{id:`home-${i}-${j}`,name:`${p} ${r[0]}`,type:r[1],rent:r[2]?Math.round(r[2]*scale):0,price:r[3]?Math.round(r[3]*scale):0,quality:Math.round((r[4]+j*.12)*10)/10,beds:r[5]};}));
+
+  const SIDE_GIGS = [
+    ['Chick-fil-A','Front Counter Shift',15],['Chick-fil-A','Drive-Thru Shift',15],['McDonald’s','Crew Shift',14],['McDonald’s','Drive-Thru Shift',14],['Buffalo Wild Wings','Server Shift',16],['Walmart','Cart Pusher Shift',13],['Walmart','Online Pickup Shift',15],['Target','Fulfillment Shift',15],['Target','Guest Services Shift',15],['Kroger','Cashier Shift',14],['Kroger','ClickList Shift',15],['Meijer','Stock Shift',15],['Costco','Food Court Shift',17],['Starbucks','Barista Shift',16],['DoorDash','Delivery Block',17],['Instacart','Shopper Block',18],['Uber','Rideshare Block',19],['Lyft','Rideshare Block',18],['Local Coffee Shop','Barista Shift',15],['Local Pizza Shop','Driver Shift',16],['Event Venue','Event Staff Shift',18],['Tutoring Marketplace','Tutor Session',24],['Freelance Platform','Web Task',30],['Dog Walking Service','Dog Walk Block',18]
+  ].map((r,i)=>({id:`gig-${i}`,company:r[0],title:r[1],hourly:r[2]}));
+
+  const NAV = [['dashboard','Dashboard'],['jobs','Jobs'],['college','College'],['businesses','Businesses'],['money','Money'],['housing','Housing'],['city','Move'],['resume','Resume'],['life','Life / Save']];
+
+  const INITIAL_STATE = {
+    schema:SAVE_SCHEMA,version:APP_VERSION,playerName:'Alex Carter',cash:100,age:18,month:1,day:1,hour:8,totalHours:0,cityId:'little-rock',
+    job:null,careerExp:0,skills:{general:0,management:0,technical:0,healthcare:0,finance:0,sales:0},
+    education:{highest:'hs',collegeId:null,major:null,minor:null,stage:null,program:null,progress:0,schoolYears:0,eligibleForGrad:false},
+    scholarship:0,studentLoan:0,savings:0,retirement:0,ira:0,investments:0,
+    home:null,rentals:[],businesses:[],history:[],applications:{},workedToday:0,overtimeToday:0,lastHarderHour:-999999,careerPromotionBonus:0,
+    lastSavedAt:0,lastSimulatedAt:Date.now(),settings:{sound:false},diagnostics:{lastRun:null,passes:[]}
+  };
+  const state = deepClone(INITIAL_STATE);
+
+  const COMPANY_CATALOG_COUNT = COMPANY_ROOTS.length * COMPANY_SUFFIXES.length;
+  const JOB_UNIVERSE_COUNT = CAREERS.length * COMPANY_CATALOG_COUNT * CITIES.length * 2;
+  const JOB_GENERATION_TARGET = CAREERS.length * COMPANY_CATALOG_COUNT;
+  let selectedPage = 'dashboard';
+  let jobPage = 1;
+
+  function deepClone(obj){return JSON.parse(JSON.stringify(obj));}
+  function getCity(id=state.cityId){return CITIES.find(c=>c.id===id)||CITIES[0];}
+  function timeKey(s=state){return s.totalHours;}
+  function currentCity(){return getCity();}
+  function currentCareer(){return state.job ? CAREER_BY_ID[state.job.careerId] || null : null;}
+  function educationStage(){return state.education?.highest || 'hs';}
+  function degreeLabel(){
+    if(!state.education || !state.education.major) return 'High school diploma';
+    const parts=[state.education.major];
+    if(state.education.minor) parts.push(`${state.education.minor} minor`);
+    if(state.education.program) parts.push(state.education.program);
+    return parts.join(' · ');
+  }
+  function totalAssets(){
+    const home = state.home?.type==='owned' ? state.home.value : 0;
+    const rentals = state.rentals.reduce((sum,r)=>sum+finite(r.value),0);
+    const businesses = state.businesses.reduce((sum,b)=>sum+finite(b.value),0);
+    return finite(state.cash)+finite(state.savings)+finite(state.retirement)+finite(state.ira)+finite(state.investments)+home+rentals+businesses-finite(state.studentLoan);
+  }
+  function sanitizeMoneyState(){
+    const keys=['cash','studentLoan','savings','retirement','ira','investments','scholarship'];
+    keys.forEach(k=>{state[k]=Math.max(0,round2(finite(state[k])));});
+    state.cash=round2(state.cash);
+    state.careerExp=Math.max(0,finite(state.careerExp));
+    Object.keys(state.skills||{}).forEach(k=>state.skills[k]=Math.max(0,finite(state.skills[k])));
+    if(!Array.isArray(state.rentals)) state.rentals=[];
+    if(!Array.isArray(state.businesses)) state.businesses=[];
+    if(!Array.isArray(state.history)) state.history=[];
+  }
+  function normalizeState(raw){
+    const merged=deepClone(INITIAL_STATE);
+    if(raw && typeof raw==='object') Object.assign(merged,raw);
+    merged.schema=SAVE_SCHEMA; merged.version=APP_VERSION;
+    merged.age=clamp(Math.floor(finite(merged.age,18)),18,100);
+    merged.month=clamp(Math.floor(finite(merged.month,1)),1,12);
+    merged.day=clamp(Math.floor(finite(merged.day,1)),1,30);
+    merged.hour=clamp(Math.floor(finite(merged.hour,8)),0,23);
+    merged.totalHours=Math.max(0,Math.floor(finite(merged.totalHours,0)));
+    if(merged.totalHours===0 && (merged.age>18 || merged.month>1 || merged.day>1 || merged.hour!==8)) merged.totalHours=Math.max(0,((merged.age-18)*360+((merged.month-1)*30)+(merged.day-1))*24+(merged.hour-8));
+    merged.cityId=CITIES.some(c=>c.id===merged.cityId)?merged.cityId:'little-rock';
+    merged.skills=Object.assign(deepClone(INITIAL_STATE.skills),merged.skills||{});
+    merged.education=Object.assign(deepClone(INITIAL_STATE.education),merged.education||{});
+    merged.education.progress=clamp(finite(merged.education.progress),0,100);
+    merged.education.highest=['hs','bachelor','grad','professional'].includes(merged.education.highest)?merged.education.highest:'hs';
+    merged.workedToday=clamp(Math.floor(finite(merged.workedToday)),0,MAX_WORK_HOURS);
+    merged.overtimeToday=clamp(Math.floor(finite(merged.overtimeToday)),0,MAX_WORK_HOURS);
+    merged.lastHarderHour=finite(merged.lastHarderHour,-999999);
+    merged.applications=(merged.applications && typeof merged.applications==='object')?merged.applications:{};
+    if(merged.job && typeof merged.job==='object'){
+      const career=CAREER_BY_ID[merged.job.careerId];
+      if(!career) merged.job=null;
+      else{
+        merged.job=Object.assign({listingId:'legacy',company:'Unknown Employer',locationId:merged.cityId,title:career.title,wage:career.hourly,hours:0,startedTotalHours:0},merged.job);
+        merged.job.wage=Math.max(0,finite(merged.job.wage,career.hourly));
+        merged.job.hours=Math.max(0,Math.floor(finite(merged.job.hours)));
+      }
+    }
+    merged.rentals=Array.isArray(merged.rentals)?merged.rentals.filter(Boolean):[];
+    merged.businesses=Array.isArray(merged.businesses)?merged.businesses.filter(Boolean):[];
+    merged.history=Array.isArray(merged.history)?merged.history.slice(-100):[];
+    merged.playerName=capText(merged.playerName||'Alex Carter',50) || 'Alex Carter';
+    merged.home=merged.home&&typeof merged.home==='object'?merged.home:null;
+    sanitizeArrayObjects(merged.rentals);sanitizeArrayObjects(merged.businesses);
+    return merged;
+  }
+  function sanitizeArrayObjects(arr){
+    arr.forEach(o=>{
+      if(!o || typeof o!=='object') return;
+      Object.keys(o).forEach(k=>{
+        if(['rent','price','value','hourly','margin','hours','staff'].includes(k)) o[k]=finite(o[k]);
+      });
+    });
+  }
+  function applyLoaded(normalized){Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,normalized);}
+
+  function storage(){
+    try{return window.localStorage;}catch(e){return null;}
+  }
+  function saveState(silent=false){
+    sanitizeMoneyState();
+    state.lastSavedAt=Date.now();
+    const payload=JSON.stringify(state);
+    try{const st=storage();if(st) st.setItem(SAVE_KEY,payload);updateSaveStatus('Saved');}catch(e){updateSaveStatus('Save unavailable');if(!silent) toast('Your browser blocked localStorage. Use Export Save on the Life tab.','warn');}
+  }
+  function loadState(){
+    try{
+      const st=storage();
+      if(!st) return;
+      const raw=st.getItem(SAVE_KEY);
+      if(!raw) return;
+      const parsed=JSON.parse(raw);
+      applyLoaded(normalizeState(parsed));
+    }catch(e){
+      try{storage()?.removeItem(SAVE_KEY);}catch(_){ }
+      applyLoaded(normalizeState(INITIAL_STATE));
+      toast('The local save was corrupted, so a clean new game was loaded.','bad');
+    }
+  }
+  function manualSave(){saveState();toast('Game saved.','good');}
+  function updateSaveStatus(text){const el=$('saveStatus');if(el) el.textContent=text;}
+
+  function companyFor(index){
+    const root=COMPANY_ROOTS[index % COMPANY_ROOTS.length];
+    const suffix=COMPANY_SUFFIXES[Math.floor(index/COMPANY_ROOTS.length)%COMPANY_SUFFIXES.length];
+    return `${root} — ${suffix}`;
+  }
+  function hashString(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+  function listingFromIndices(careerIndex,companyIndex,cityIndex=0,shiftIndex=0){
+    const c=CAREERS[careerIndex];const city=CITIES[cityIndex % CITIES.length];
+    const hash=hashString(`${careerIndex}|${companyIndex}|${cityIndex}|${shiftIndex}`);
+    const wageBase=c.hourly * city.salary;
+    const wage=wageBase*(.93+(hash%17)*.01)*(shiftIndex?1.02:1);
+    return {id:`job-${careerIndex}-${companyIndex}-${cityIndex}-${shiftIndex}`,careerId:c.id,field:c.field,title:c.title,company:companyFor(companyIndex),locationId:city.id,hourly:round2(Math.max(8,wage)),edu:c.edu,exp:c.exp,shift:shiftIndex?'Evening / flexible':'Standard'};
+  }
+  function materializeJobs(){
+    const jobs=[];
+    for(let ci=0;ci<CAREERS.length;ci++){
+      for(let co=0;co<COMPANY_ROOTS.length;co++){
+        const companyIndex=(co + ci*17) % COMPANY_CATALOG_COUNT;
+        jobs.push(listingFromIndices(ci,companyIndex,(ci+co)%CITIES.length,(ci+co)%2));
+      }
+    }
+    return jobs;
+  }
+  const JOBS=materializeJobs();
+
+  function requiredEduValue(edu){return ({hs:0,bachelor:1,grad:2,professional:3})[edu] ?? 0;}
+  function educationQualifies(job){
+    const completedBachelor = state.education.highest==='bachelor' || state.education.highest==='grad' || state.education.highest==='professional';
+    const completedAdvanced = state.education.highest==='grad' || state.education.highest==='professional';
+    if(job.edu==='hs') return true;
+    if(job.edu==='bachelor') return completedBachelor && !!state.education.completed;
+    if(job.edu==='grad') return completedAdvanced && !!state.education.completed;
+    if(job.edu==='professional') return state.education.highest==='professional' && !!state.education.completed;
+    return false;
+  }
+  function majorMatchesProfessional(job){
+    if(job.field==='Healthcare' && job.title==='Neurosurgeon'){
+      const m=(state.education.major||'').toLowerCase();
+      return /biology|biochem|neuroscience|molecular biology|cell biology|biomedical|chemistry/.test(m) && state.education.highest==='professional' && state.education.program==='Medical School (MD)';
+    }
+    if(job.field==='Legal' && job.edu==='professional') return state.education.program==='Juris Doctor (Law School)';
+    if(job.title==='Physician' || job.title==='Surgeon' || job.title==='Chief Medical Officer') return state.education.program==='Medical School (MD)';
+    if(job.title==='Dentist') return state.education.program==='Dental School (DDS/DMD)';
+    if(job.title==='Pharmacist') return state.education.program==='Pharmacy School (PharmD)';
+    return true;
+  }
+  function skillTotal(){return Object.values(state.skills).reduce((a,v)=>a+finite(v),0);}
+  function qualification(job){
+    const degreeOk=educationQualifies(job)&&majorMatchesProfessional(job);
+    const expOk=state.careerExp>=job.exp;
+    const skillBonus=Math.min(20,skillTotal()/6);
+    const expScore=expOk?30:Math.max(0,30-Math.max(0,job.exp-state.careerExp)*3.5);
+    const eduScore=degreeOk?45:0;
+    const prestige=(state.education.collegeId?COLLEGES.find(c=>c.id===state.education.collegeId)?.prestige:1)||1;
+    const schoolBonus=clamp(prestige*5,2,8);
+    const score=eduScore+expScore+skillBonus+schoolBonus+state.careerPromotionBonus;
+    return {degreeOk,expOk,score:clamp(score,0,100)};
+  }
+  function jobSearchResults(){
+    const search=($('jobSearch')?.value||'').trim().toLowerCase();
+    const terms=search.split(/\s+/).filter(Boolean);
+    const field=$('jobField')?.value||'all';
+    const edu=$('jobEdu')?.value||'all';
+    let arr=JOBS.filter(j=>{
+      if(field!=='all' && j.field!==field) return false;
+      if(edu!=='all' && j.edu!==edu) return false;
+      const city=getCity(j.locationId).name.toLowerCase();
+      const haystack=`${j.title} ${j.company} ${j.field} ${city}`.toLowerCase();
+      return !terms.length || terms.every(term=>haystack.includes(term));
+    });
+    if(search){
+      const direct=[];
+      CAREERS.forEach((c,ci)=>{
+        if(`${c.title} ${c.field}`.toLowerCase().includes(search)){
+          COMPANY_ROOTS.forEach((co,companyIndex)=>{
+            const companyMatch=COMPANY_ROOTS[companyIndex].toLowerCase().includes(search);
+            if(companyMatch || c.title.toLowerCase().includes(search) || c.field.toLowerCase().includes(search)) direct.push(listingFromIndices(ci,companyIndex,(ci+companyIndex)%CITIES.length,ci%2));
+          });
+        }
+      });
+      const map=new Map([...direct,...arr].map(j=>[j.id,j]));arr=[...map.values()];
+    }
+    arr.sort((a,b)=>b.hourly-a.hourly || a.title.localeCompare(b.title));
+    return arr;
+  }
+
+  function navHtml(){return NAV.map(([id,label])=>`<button type="button" class="${selectedPage===id?'active':''}" data-page="${id}">${label}</button>`).join('');}
+  function showPage(id){
+    if(!NAV.some(n=>n[0]===id)) id='dashboard';
+    selectedPage=id;
+    qsa('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${id}`));
+    $('nav').innerHTML=navHtml();
+    if(id==='jobs') renderJobs();
+    if(id==='college') renderCollege();
+    if(id==='businesses') renderBusinesses();
+    if(id==='housing') renderHousing();
+    if(id==='city') renderCities();
+    if(id==='resume') renderResume();
+    if(id==='money') renderMoney();
+    if(id==='life') renderLife();
+    updateClock();
+  }
+
+  function toast(message,type='info'){
+    const box=$('toastbox');if(!box)return;
+    const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=message;box.appendChild(el);
+    window.setTimeout(()=>el.remove(),3600);
+  }
+  function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').classList.add('open');$('modal').setAttribute('aria-hidden','false');}
+  function closeModal(){$('modal').classList.remove('open');$('modal').setAttribute('aria-hidden','true');$('modalBody').innerHTML='';}
+
+  function updateClock(){
+    const c=currentCity();$('clock').textContent=`Age ${state.age} · ${c.name} · Month ${state.month}, Day ${state.day} · ${String(state.hour).padStart(2,'0')}:00`;
+    $('moneyTop').textContent=money(state.cash);
+  }
+  function cooldownRemaining(){return Math.max(0,HARDER_COOLDOWN-(timeKey()-state.lastHarderHour));}
+  function cooldownText(){const x=cooldownRemaining();return x<=0?'Ready':`${x.toFixed(1)}h remaining`;}
+
+  function recordHistory(entry){state.history.push({...entry,t:Date.now()});if(state.history.length>100)state.history.shift();}
+  function pushActivity(text){recordHistory({type:'activity',text,age:state.age});}
+
+  function randomEvent(){
+    const roll=Math.random();
+    if(roll>.12) return;
+    const events=[
+      ()=>{state.cash+=10;return 'A rebate or cashback opportunity added $10.';},
+      ()=>{const loss=Math.min(18,state.cash);state.cash-=loss;return `An unexpected small expense cost ${money(loss)}.`;},
+      ()=>{state.skills.general+=.15;return 'You learned a useful professional skill on the job.';},
+      ()=>{if(state.job){state.careerExp+=.15;return 'A mentor helped you improve at work.';}return 'You spent time learning about business opportunities.';},
+      ()=>{const gain=round2(Math.random()*25);state.cash+=gain;return `You completed a tiny one-off opportunity for ${money(gain)}.`;}
+    ];
+    const msg=pick(events)();pushActivity(msg);toast(msg,'info');
+  }
+
+  function businessHourTick(){
+    state.businesses.forEach(b=>{
+      const c=getCity(b.locationId || state.cityId);
+      const volatility=.72+Math.random()*.56;
+      const gross=Math.max(0,finite(b.hourly)*c.biz*volatility);
+      const operatingCost=gross*clamp(1-finite(b.margin,.15),.05,.96);
+      const profit=Math.max(0,gross-operatingCost);
+      state.cash+=afterTax(profit);
+      b.value=Math.max(finite(b.value),finite(b.value)+profit*.03);
+      b.hours=Math.max(0,Math.floor(finite(b.hours)))+1;
+      if(Math.random()<.004) b.value*=.97;
+    });
+  }
+  function investmentTick(){
+    state.savings=Math.max(0,state.savings + state.savings*.042/12);
+    state.retirement=Math.max(0,state.retirement + state.retirement*.055/12);
+    state.ira=Math.max(0,state.ira + state.ira*.052/12);
+    const monthlyReturn=(-.10+Math.random()*.24)/12;
+    state.investments=Math.max(0,state.investments*(1+monthlyReturn));
+  }
+  function monthlyTick(){
+    investmentTick();
+    if(state.studentLoan>0) state.studentLoan=Math.max(0,state.studentLoan*(1+.057/12));
+    if(state.home?.type==='rent'){
+      const rent=finite(state.home.monthlyRent);
+      state.cash-=rent;
+      if(state.cash<0){const needed=Math.abs(state.cash);state.cash=0;state.studentLoan+=needed;pushActivity(`Your rent payment exceeded your cash, so ${money(needed)} was added to an emergency balance.`);}
+    }
+    state.rentals.forEach(r=>{state.cash=round2(state.cash+round2(afterTax(finite(r.monthlyRent))));r.value=Math.max(0,finite(r.value)*(1+(-.02+Math.random()*.05)));});
+    if(state.education.stage && state.education.progress>=100) completeCurrentProgram();
+  }
+  function annualTick(){
+    if(state.job) checkPromotion(true);
+    state.careerPromotionBonus=0;
+    if(state.age>=100){state.age=100;state.hour=0;}
+  }
+  function advanceOneHour({source='time',notify=true}={}){
+    if(state.age>=100){toast('Your simulated life has reached its 100-year cap.','warn');return false;}
+    businessHourTick();
+    state.hour+=1;state.totalHours+=1;
+    if(state.hour>=24){state.hour=0;state.day+=1;state.workedToday=0;state.overtimeToday=0;}
+    if(state.day>30){state.day=1;state.month+=1;monthlyTick();}
+    if(state.month>12){state.month=1;state.age+=1;annualTick();}
+    randomEvent();
+    sanitizeMoneyState();
+    saveState(true);
+    renderAll();
+    if(notify && source==='time') toast('+1 hour simulated.','good');
+    return true;
+  }
+
+  function afterTax(gross){return Math.max(0,finite(gross))*(1-clamp(finite(currentCity().tax),0,.60));}
+  function workOneHour(harder=false){
+    if(state.age>=100){toast('Your simulated life has reached the 100-year cap. Work is no longer available.','warn');return false;}
+    if(!state.job){toast('You need a primary job first. Businesses and side gigs can still make money without one.','warn');return false;}
+    if(state.workedToday>=MAX_WORK_HOURS){toast(`You have reached the ${MAX_WORK_HOURS}-hour workday limit. Advance time to reset.`, 'warn');return false;}
+    if(state.education.stage && !state.education.completed && state.education.workRestricted){toast('This school program currently restricts normal employment while enrolled.','warn');return false;}
+    const now=timeKey();
+    if(harder && now-state.lastHarderHour<HARDER_COOLDOWN){toast(`Work Harder has a ${HARDER_COOLDOWN}-hour cooldown. ${cooldownText()}.`,'warn');return false;}
+    const career=currentCareer();if(!career){toast('Your saved career is invalid. Quit and reapply for a valid job.','bad');return false;}
+    const base=Math.max(0,finite(state.job.wage));
+    const overtime=state.workedToday>=OVERTIME_START;
+    const multiplier=harder?1.35:1;
+    if(harder) state.lastHarderHour=now;
+    const gross=base*multiplier*(overtime?1.5:1);
+    const pay=round2(afterTax(gross));
+    state.cash+=pay;
+    state.workedToday+=1;
+    if(overtime)state.overtimeToday+=1;
+    state.job.hours+=1;
+    state.careerExp+=overtime?.18:.12;
+    state.skills.general+=.08;
+    if(['Technology','Engineering','Science'].includes(career.field)) state.skills.technical+=.08;
+    if(career.field==='Healthcare') state.skills.healthcare+=.10;
+    if(career.field==='Finance') state.skills.finance+=.10;
+    if(career.field==='Sales'||career.field==='Media') state.skills.sales+=.09;
+    if(career.field==='Operations'||career.field==='Retail'||career.field==='Food'||career.field==='Warehouse') state.skills.management+=.04;
+    if(career.field==='Finance') state.skills.finance+=.04;
+    const match=currentEmployerMatch();
+    if(match>0) state.retirement=round2(state.retirement+round2(afterTax(base*match)));
+    pushActivity(`${harder?'Worked harder at ': 'Worked at '}${state.job.company}. Earned ${money(pay)}${overtime?' with overtime rate':''}.`);
+    advanceOneHour({source:'work',notify:false});
+    toast(`${harder?'Work Harder: ':''}+${money(pay)} earned${overtime?' · overtime rate applied':''}.`,'good');
+    return true;
+  }
+  function currentEmployerMatch(){const wage=finite(state.job?.wage);if(!wage)return 0;return clamp(wage>=80?.05:wage>=40?.03:.015,0,.05);}
+
+  function applyJob(id){
+    if(state.job){toast('You already have a primary job. Quit your current job before taking another one.','warn');return false;}
+    const job=JOBS.find(j=>j.id===id);if(!job){toast('That listing is no longer available. Refresh the job market.','bad');return false;}
+    const q=qualification(job);
+    if(!q.degreeOk){toast(`This role requires ${job.edu==='bachelor'?'a bachelor-level degree':job.edu==='grad'?'graduate study':'professional school'}.`,'warn');return false;}
+    if(q.score<58){state.applications[id]='declined';saveState(true);toast('Application declined for now. Build experience, skills, or education and try again.','bad');renderJobs();return false;}
+    state.job={listingId:id,careerId:job.careerId,title:job.title,company:job.company,locationId:job.locationId,wage:job.hourly,hours:0,startedTotalHours:state.totalHours};
+    state.careerExp+=.2;state.skills.general+=.4;state.applications[id]='hired';
+    pushActivity(`Hired as ${job.title} at ${job.company} for ${money(job.hourly)}/hour.`);
+    saveState();renderAll();toast(`Hired at ${job.company}. ${money(job.hourly)}/hour.`,'good');return true;
+  }
+  function quitJob(){
+    if(!state.job){toast('You do not have a primary job.','info');return false;}
+    recordHistory({type:'job',title:state.job.title,company:state.job.company,wage:state.job.wage,age:state.age});
+    pushActivity(`Left ${state.job.company}.`);state.job=null;saveState();renderAll();toast('You left your primary job.','good');return true;
+  }
+
+  function checkPromotion(manual=false){
+    const current=currentCareer();if(!current)return false;
+    const next=CAREERS.filter(c=>c.field===current.field&&c.exp>current.exp).sort((a,b)=>a.exp-b.exp)[0];
+    if(!next)return false;
+    const skillScore=skillTotal();
+    const prestige=(COLLEGES.find(c=>c.id===state.education.collegeId)?.prestige)||1;
+    const meetsExperience=state.careerExp>=next.exp;
+    const meetsSkills=skillScore>=Math.max(2,next.exp*1.12);
+    const educationOK=requiredEduValue(next.edu)<=requiredEduValue(educationStage()) || next.edu==='hs';
+    const chance=clamp(.18+(prestige-.9)*.18+(meetsExperience?.18:0)+(meetsSkills?.16:0),.06,.76);
+    if(meetsExperience&&meetsSkills&&educationOK&&Math.random()<chance){
+      state.job.careerId=next.id;state.job.title=next.title;state.job.wage=round2(next.hourly*currentCity().salary);state.careerPromotionBonus=Math.min(8,state.careerPromotionBonus+2);
+      pushActivity(`Promotion: ${next.title} at ${state.job.company}.`);toast(`Promotion! You are now ${next.title}.`,'good');return true;
+    }
+    if(manual && meetsExperience && meetsSkills && educationOK) toast('You are promotion-ready, but the promotion did not happen this cycle. Keep building experience.','info');
+    return false;
+  }
+
+  function workSideGig(id){
+    if(state.age>=100){toast('Your simulated life has reached the 100-year cap. Side work is no longer available.','warn');return false;}
+    if(state.workedToday>=MAX_WORK_HOURS){toast(`You have reached the ${MAX_WORK_HOURS}-hour workday limit.`,'warn');return false;}
+    if(state.education.stage && !state.education.completed && state.education.workRestricted){toast('Your current school program restricts outside work.','warn');return false;}
+    const gig=SIDE_GIGS.find(g=>g.id===id);if(!gig)return false;
+    const overtime=state.workedToday>=OVERTIME_START;const pay=afterTax(gig.hourly*(overtime?1.5:1));
+    state.cash+=pay;state.workedToday+=1;if(overtime)state.overtimeToday+=1;state.careerExp+=.04;state.skills.general+=.03;
+    pushActivity(`Worked a side shift at ${gig.company} as ${gig.title} for ${money(pay)}.`);
+    advanceOneHour({source:'side',notify:false});toast(`Side shift complete: +${money(pay)}.`,'good');return true;
+  }
+
+  function availableProgramMajorRequirements(programId,major){
+    const text=(major||'').toLowerCase();
+    if(programId==='medical-school') return /biology|biochem|neuroscience|molecular biology|cell biology|biomedical|chemistry/.test(text);
+    if(programId==='dental-school') return /biology|biochem|neuroscience|chemistry|biomedical/.test(text);
+    if(programId==='pharmacy-school') return /biology|biochem|chemistry|pharmac|biomedical/.test(text);
+    return true;
+  }
+  function openCollegeModal(collegeId){
+    const college=COLLEGES.find(c=>c.id===collegeId);if(!college)return;
+    const canBachelor=state.education.highest==='hs' && !state.education.stage;
+    const canAdvanced=state.education.completed && ['bachelor','grad'].includes(state.education.highest);
+    const majorOptions=ALL_MAJORS.map(m=>`<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
+    let html=`<p class="muted">${escapeHtml(college.name)} costs about ${money(college.tuition)} per year for undergraduate study. Scholarships may reduce the cost. ${college.loans?'This college allows student loans in this game.':'This college does not allow student loans in this game, so you need enough cash and/or scholarship money to enroll.'}</p>`;
+    if(canBachelor){
+      html+=`<div class="two"><div><label>Major</label><select id="majorPick" class="select" style="margin-top:5px">${majorOptions}</select></div><div><label>Minor</label><select id="minorPick" class="select" style="margin-top:5px"><option value="">No minor</option>${ALL_MINORS.map(m=>`<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('')}</select></div></div><div class="controls" style="margin-top:12px"><button class="btn primary small" data-modal-action="start-bachelor" data-college-id="${college.id}">Start Bachelor’s Degree</button></div>`;
+    }else if(canAdvanced){
+      html+=`<div class="list">${GRAD_PROGRAMS.map(p=>{const allowed=availableProgramMajorRequirements(p.id,state.education.major);return `<div class="item"><div class="row"><div><h3>${escapeHtml(p.name)}</h3><p>${p.years} simulated years · tuition ≈ ${money(college.tuition*p.tuitionFactor)}/yr</p></div><button class="btn small primary" data-modal-action="start-advanced" data-program-id="${p.id}" data-college-id="${college.id}" ${allowed?'':'disabled'}>${allowed?'Apply':'Major prerequisite'}</button></div></div>`;}).join('')}</div>`;
+    }else{
+      html+='<div class="empty">Finish your current program before applying for another credential. Advanced programs unlock after a completed bachelor-level degree.</div>';
+    }
+    openModal(`Apply to ${college.name}`,html);
+  }
+  function applyScholarship(collegeId){
+    if(state.education.stage && !state.education.completed){toast('Finish your current program before applying for a new scholarship.','info');return false;}
+    const c=COLLEGES.find(x=>x.id===collegeId);if(!c)return false;
+    const key=`${collegeId}:${state.education.highest}`;
+    if(state.applications[key]){toast('You already applied for this scholarship cycle.','info');return;}
+    state.applications[key]='applied';
+    const award=round2(c.tuition*(.08+Math.random()*.42));
+    state.scholarship=Math.max(state.scholarship,award);saveState();renderCollege();toast(`Scholarship offer: ${money(award)} toward ${c.name}.`,'good');
+  }
+  function startBachelor(collegeId){
+    const c=COLLEGES.find(x=>x.id===collegeId);if(!c)return false;
+    if(state.education.stage || state.education.highest!=='hs'){toast('Finish your current education before starting another bachelor program.','warn');return false;}
+    const major=$('majorPick')?.value;const minor=$('minorPick')?.value||null;if(!major){toast('Choose a major.','bad');return;}
+    const acceptance=clamp(c.accept+(c.type==='community'?.42:0)+Math.min(.14,state.skills.general/400),.05,.98);
+    if(Math.random()>acceptance){state.applications[collegeId]='declined';saveState();closeModal();toast(`Application declined by ${c.name}. Improve your profile and try another school.`,'bad');renderCollege();return;}
+    const scholarship=state.scholarship>0?state.scholarship:round2(c.tuition*(Math.random()<.55?.10+.40*Math.random():0));
+    const total=round2(Math.max(0,c.tuition*clamp(c.years/4,.5,1)-scholarship));
+    if(state.cash+MONEY_EPSILON<total && !c.loans){toast(`This college does not offer student loans here. You need ${money(total)} available after scholarship.`, 'warn');return false;}
+    if(state.cash>=total) state.cash-=total; else state.studentLoan+=round2(total-state.cash),state.cash=0;
+    state.education={highest:'bachelor',collegeId:c.id,major,minor,stage:'bachelor',program:'Bachelor’s Degree',progress:0,schoolYears:c.years,eligibleForGrad:false,completed:false,workRestricted:!c.work};
+    state.scholarship=0;state.skills.general+=1+(minor?.5:0);pushActivity(`Enrolled at ${c.name} for ${major}.`);saveState();closeModal();renderAll();toast(`Enrolled at ${c.name}. Your degree begins now.`,'good');return true;
+  }
+  function startAdvancedProgram(collegeId,programId){
+    const c=COLLEGES.find(x=>x.id===collegeId);const p=GRAD_PROGRAMS.find(x=>x.id===programId);if(!c||!p)return false;
+    if(!state.education.completed || !['bachelor','grad'].includes(state.education.highest)){toast('Complete a bachelor-level degree first.','warn');return false;}
+    if(p.requiredMajor&&!availableProgramMajorRequirements(p.id,state.education.major)){toast('Your bachelor major does not satisfy this professional-school prerequisite in the game model.','warn');return false;}
+    const annual=round2(c.tuition*p.tuitionFactor);const total=round2(annual*p.years);const scholarship=0;
+    if(state.cash+MONEY_EPSILON<total && !c.loans){toast(`This college does not offer student loans here. You need ${money(total)} in cash for this program.`, 'warn');return false;}
+    if(state.cash>=total) state.cash-=total;else state.studentLoan+=round2(total-state.cash),state.cash=0;
+    state.education={...state.education,highest:p.stage,stage:'advanced',program:p.name,progress:0,schoolYears:p.years,eligibleForGrad:false,completed:false,workRestricted:true};
+    pushActivity(`Started ${p.name} at ${c.name}.`);saveState();closeModal();renderAll();toast(`Started ${p.name}.`,'good');
+  }
+  function studyHarder(){
+    if(state.age>=100){toast('Your simulated life has reached the 100-year cap. Study actions are no longer available.','warn');return false;}
+    if(!state.education.stage || state.education.completed){toast('You are not currently enrolled in a program.','info');return false;}
+    const now=timeKey();if(now-state.lastHarderHour<HARDER_COOLDOWN){toast(`Study Harder has a ${HARDER_COOLDOWN}-hour cooldown. ${cooldownText()}.`,'warn');return false;}
+    state.lastHarderHour=now;state.education.progress=clamp(state.education.progress+1.8,0,100);state.skills.general+=.25;state.careerExp+=.05;
+    const advanced=state.education.stage==='advanced';
+    advanceOneHour({source:'study',notify:false});
+    if(state.education.progress>=100) completeCurrentProgram();
+    toast(`Studied harder. ${advanced?'Advanced program':'College'} progress increased.`,'good');return true;
+  }
+  function completeCurrentProgram(){
+    if(!state.education.stage || state.education.completed)return false;
+    state.education.completed=true;state.education.progress=100;state.education.workRestricted=false;state.education.eligibleForGrad=state.education.highest==='bachelor';
+    if(state.education.highest==='bachelor') state.education.highest='bachelor';
+    state.careerExp+=4;state.skills.general+=1.5;pushActivity(`Completed ${state.education.program}.`);
+    toast(`Program completed: ${state.education.program}.`,'good');return true;
+  }
+
+  function buyBusiness(id){
+    const b=BUSINESSES.find(x=>x.id===id);if(!b)return false;
+    const price=round2(b.cost*currentCity().econ);
+    if(state.cash+MONEY_EPSILON<price){toast(`You cannot afford ${b.name}. You need ${money(price)}.`,'warn');return false;}
+    state.cash=round2(state.cash-price);
+    state.businesses.push({id:uid('bizowned'),templateId:id,name:b.name,industry:b.industry,cost:price,value:price,hourly:b.hourly,margin:b.margin,locationId:state.cityId,hours:0,staff:b.staff,manager:false});
+    state.skills.management+=.15;pushActivity(`Opened ${b.name} in ${currentCity().name}.`);saveState();renderBusinesses();renderDashboard();toast(`Business opened for ${money(price)}.`,'good');return true;
+  }
+  function upgradeBusiness(id){
+    const b=state.businesses.find(x=>x.id===id);if(!b)return false;
+    const cost=Math.max(500,round2(finite(b.value)*.25));if(state.cash+MONEY_EPSILON<cost){toast(`Expansion costs ${money(cost)}.`,'warn');return false;}
+    state.cash=round2(state.cash-cost);b.value=round2(finite(b.value)+cost);b.hourly=round2(finite(b.hourly)*1.14);b.margin=clamp(finite(b.margin)+.008,.04,.65);b.staff+=Math.max(1,Math.ceil(finite(b.staff)*.12));
+    pushActivity(`Expanded ${b.name}.`);saveState();renderBusinesses();renderDashboard();toast(`${b.name} expanded.`,'good');return true;
+  }
+  function hireManager(id){
+    const b=state.businesses.find(x=>x.id===id);if(!b)return false;if(b.manager){toast('This business already has a manager.','info');return false;}
+    const fee=Math.max(250,round2(finite(b.hourly)*6));if(state.cash<fee){toast(`Manager hiring costs ${money(fee)}.`,'warn');return false;}
+    state.cash=round2(state.cash-fee);b.manager=true;b.hourly=round2(b.hourly*1.08);state.skills.management+=.4;pushActivity(`Hired a manager for ${b.name}.`);saveState();renderBusinesses();toast(`Manager hired for ${b.name}.`,'good');return true;
+  }
+
+  function currentHomeMonthlyCost(){return state.home?.type==='rent'?finite(state.home.monthlyRent):0;}
+  function rentHome(id){
+    const h=HOMES.find(x=>x.id===id);if(!h||h.type!=='rent')return false;
+    const monthly=round2(h.rent*currentCity().housing);const deposit=round2(monthly*1.5);
+    if(state.cash+MONEY_EPSILON<deposit){toast(`You need first month plus deposit: ${money(deposit)}.`,'warn');return false;}
+    if(state.home){toast('You already have a home. End your current lease before renting another home.','warn');return false;}
+    state.cash=round2(state.cash-deposit);state.home={id:h.id,name:h.name,type:'rent',cityId:state.cityId,monthlyRent:monthly,value:0,leaseMonths:12};pushActivity(`Rented ${h.name} for ${money(monthly)}/month.`);saveState();renderHousing();renderDashboard();toast(`You rented ${h.name}.`,'good');return true;
+  }
+  function buyHome(id){
+    const h=HOMES.find(x=>x.id===id);if(!h||h.type!=='buy')return false;if(state.home){toast('You already have a home. Sell it or end the lease before buying another.','warn');return false;}
+    const price=round2(h.price*currentCity().housing);if(state.cash+MONEY_EPSILON<price){toast(`You need ${money(price)} cash for this simplified purchase model.`,'warn');return false;}
+    state.cash=round2(state.cash-price);state.home={id:h.id,name:h.name,type:'owned',cityId:state.cityId,monthlyRent:0,value:price,beds:h.beds};pushActivity(`Bought ${h.name} for ${money(price)}.`);saveState();renderHousing();renderDashboard();toast(`Purchased ${h.name}.`,'good');return true;
+  }
+  function endLeaseOrSellHome(){
+    if(!state.home){toast('You do not have a current home.','info');return false;}
+    if(state.home.type==='rent'){
+      const fee=Math.round(currentHomeMonthlyCost()*.25);state.cash=Math.max(0,round2(state.cash-fee));pushActivity(`Ended the lease on ${state.home.name}.`);state.home=null;saveState();renderHousing();renderDashboard();toast('Lease ended.','good');return true;
+    }
+    const proceeds=round2(finite(state.home.value)*.93);state.cash+=proceeds;pushActivity(`Sold ${state.home.name} for ${money(proceeds)} after selling costs.`);state.home=null;saveState();renderHousing();renderDashboard();toast(`Home sold for ${money(proceeds)}.`,'good');return true;
+  }
+  function buyRental(id){
+    const h=HOMES.find(x=>x.id===id);if(!h||h.type!=='buy')return false;
+    const price=round2(h.price*currentCity().housing);const closing=round2(price*.05);const total=round2(price+closing);if(state.cash<total){toast(`You need ${money(total)} including closing costs.`,'warn');return false;}
+    const monthlyRent=round2(price/110);state.cash=round2(state.cash-total);state.rentals.push({id:uid('rental'),name:h.name,cityId:state.cityId,purchasePrice:price,rentYield:.0091,monthlyRent,value:price});pushActivity(`Bought a rental property: ${h.name}.`);saveState();renderHousing();renderDashboard();toast(`Rental property purchased for ${money(total)}.`,'good');return true;
+  }
+  function sellRental(id){
+    const i=state.rentals.findIndex(r=>r.id===id);if(i<0)return false;const r=state.rentals[i];const proceeds=round2(finite(r.value)*.93);state.cash+=proceeds;state.rentals.splice(i,1);pushActivity(`Sold rental ${r.name} for ${money(proceeds)}.`);saveState();renderHousing();renderDashboard();toast(`Rental sold for ${money(proceeds)}.`,'good');return true;
+  }
+
+  function moveCity(id){
+    if(!CITIES.some(c=>c.id===id)||id===state.cityId)return false;
+    const dest=getCity(id);const origin=currentCity();const distanceFactor=origin.id===dest.id?0:1;const moveCost=round2((origin.moveBase+dest.moveBase)*.55*distanceFactor*(state.home?.type==='owned'?1.15:1));
+    const leaseBreak=state.home?.type==='rent'?round2(currentHomeMonthlyCost()*.25):0;
+    const totalMovingCost=round2(moveCost+leaseBreak);
+    if(state.cash<totalMovingCost){toast(`Moving to ${dest.name} costs about ${money(totalMovingCost)} including relocation fees.`,'warn');return false;}
+    state.cash=round2(state.cash-totalMovingCost);
+    if(leaseBreak>0){state.home=null;pushActivity(`Paid a ${money(leaseBreak)} lease-break fee while moving.`);}
+    state.cityId=id;
+    if(state.job){state.job.locationId=id;const career=currentCareer();if(career)state.job.wage=round2(career.hourly*dest.salary);}
+    pushActivity(`Moved from ${origin.name} to ${dest.name}.`);saveState();renderAll();toast(`Moved to ${dest.name}.`,'good');return true;
+  }
+
+  function moneyMove(type){
+    const map={toSavings:['saveAmt','savings'],fromSavings:['saveAmt','savings'],toRet:['retAmt','retirement'],fromRet:['retAmt','retirement'],toIra:['iraAmt','ira'],fromIra:['iraAmt','ira'],toInv:['invAmt','investments'],fromInv:['invAmt','investments']};
+    const item=map[type];if(!item)return false;const amt=round2(Number($(item[0])?.value));if(!Number.isFinite(amt)||amt<=0){toast('Enter a valid positive amount.','bad');return false;}
+    const account=item[1];const to=type.startsWith('to');
+    if(to){if(state.cash+MONEY_EPSILON<amt){toast('Not enough cash in checking.','warn');return false;}state.cash=round2(state.cash-amt);state[account]=round2(state[account]+amt);}
+    else{if(state[account]+MONEY_EPSILON<amt){toast(`Not enough money in ${account}.`,'warn');return false;}state[account]=round2(state[account]-amt);state.cash=round2(state.cash+amt);}
+    $(item[0]).value='';saveState();renderMoney();renderDashboard();toast(`${to?'Moved':'Withdrew'} ${money(amt)} ${to?'into':'from'} ${account}.`,'good');return true;
+  }
+  function payStudentLoan(){
+    const amt=round2(Number($('loanAmt')?.value));if(!Number.isFinite(amt)||amt<=0){toast('Enter a valid payment amount.','bad');return false;}if(state.studentLoan<=MONEY_EPSILON){toast('You have no student loan balance.','info');return false;}const pay=Math.min(amt,state.studentLoan);if(state.cash+MONEY_EPSILON<pay){toast('Not enough checking cash for that payment.','warn');return false;}state.cash=round2(state.cash-pay);state.studentLoan=round2(state.studentLoan-pay);$('loanAmt').value='';saveState();renderMoney();renderDashboard();toast(`Paid ${money(pay)} toward student loans.`,'good');return true;
+  }
+
+  function renderDashboard(){
+    updateClock();
+    const assets=totalAssets();
+    $('statsCards').innerHTML=[['Cash',money(state.cash)],['Net worth',money(assets)],['Current wage',state.job?`${money(state.job.wage)}/hr`:'$0.00/hr'],['Businesses',number(state.businesses.length)],['Career experience',state.careerExp.toFixed(1)],['Worked today',`${state.workedToday}/${MAX_WORK_HOURS}h`],['Student loan',money(state.studentLoan)],['Savings',money(state.savings)]].map(([a,v])=>`<div class="card"><div class="label">${escapeHtml(a)}</div><div class="value">${escapeHtml(v)}</div></div>`).join('');
+    const career=currentCareer();
+    $('careerSummary').innerHTML=state.job?`<div class="row"><div><b>${escapeHtml(state.job.title)}</b><div class="muted tiny">${escapeHtml(state.job.company)}</div></div><span class="pill">${money(state.job.wage)}/hr</span></div><div class="tags"><span class="tag">Exp ${state.careerExp.toFixed(1)}</span><span class="tag">Today ${state.workedToday}/${MAX_WORK_HOURS}h</span><span class="tag">Overtime ${state.overtimeToday}h</span><span class="tag">401(k) match ${Math.round(currentEmployerMatch()*100)}%</span></div><div class="controls" style="margin-top:9px"><button class="btn small" data-page="jobs">Career market</button><button class="btn small bad" data-action="quit-job">Quit</button></div>`:`<div class="empty">No primary job yet.<br><button class="btn small primary" data-page="jobs" style="margin-top:8px">Find a job</button></div>`;
+    const home=state.home?`${state.home.name} (${state.home.type==='rent'?money(state.home.monthlyRent)+'/mo':'Owned'})`:'No home';
+    $('lifeSummary').innerHTML=`<div class="tags"><span class="tag">Education: ${escapeHtml(degreeLabel())}</span><span class="tag">City: ${escapeHtml(currentCity().name)}</span><span class="tag">Home: ${escapeHtml(home)}</span><span class="tag">401(k) ${money(state.retirement)}</span><span class="tag">IRA ${money(state.ira)}</span><span class="tag">Investments ${money(state.investments)}</span></div><div style="margin-top:10px"><div class="row"><span class="muted tiny">Work Harder cooldown</span><span class="tiny">${cooldownText()}</span></div><div class="progress" style="margin-top:5px"><i style="width:${clamp(((HARDER_COOLDOWN-cooldownRemaining())/HARDER_COOLDOWN)*100,0,100)}%"></i></div></div>`;
+    const hist=state.history.slice(-8).reverse().map(h=>`<div class="item"><div class="row"><b>${escapeHtml(h.title||h.text||h.type||'Activity')}</b><span class="tiny muted">Age ${escapeHtml(h.age??state.age)}</span></div>${h.company?`<p>${escapeHtml(h.company)}</p>`:''}${h.text&&!h.title?`<p>${escapeHtml(h.text)}</p>`:''}</div>`).join('');
+    $('activity').innerHTML=hist||'<div class="empty">Your life log will appear here.</div>';
+  }
+
+  function renderJobs(){
+    const arr=jobSearchResults();
+    const total=arr.length;const pages=Math.max(1,Math.ceil(total/JOB_PAGE_SIZE));jobPage=clamp(jobPage,1,pages);const start=(jobPage-1)*JOB_PAGE_SIZE;const pageRows=arr.slice(start,start+JOB_PAGE_SIZE);
+    $('jobCount').textContent=number(total);
+    if(!pageRows.length)$('jobList').innerHTML='<div class="empty">No listings match those filters.</div>';else $('jobList').innerHTML=pageRows.map(j=>{const q=qualification(j);const locked=!q.degreeOk || !!state.job;return `<div class="item"><div class="row"><div><h3>${escapeHtml(j.title)}</h3><p>${escapeHtml(j.company)} · ${escapeHtml(getCity(j.locationId).name)}</p></div><div style="text-align:right"><b>${money(j.hourly)}/hr</b><div class="tiny muted">${escapeHtml(j.edu==='hs'?'High school':j.edu==='bachelor'?'Bachelor / college':j.edu==='grad'?'Graduate':'Professional')}</div></div></div><div class="tags"><span class="tag">${escapeHtml(j.field)}</span><span class="tag">${j.exp} yrs target</span><span class="tag">Fit ${Math.round(q.score)}%</span><span class="tag">${escapeHtml(j.shift)}</span></div><div class="controls" style="margin-top:8px">${state.job?'<span class="muted tiny">Primary job occupied.</span>':`<button type="button" class="btn small primary" data-action="apply-job" data-id="${j.id}" ${locked?'disabled':''}>Take Job</button>`}</div></div>`;}).join('');
+    $('jobPages').innerHTML=Array.from({length:Math.min(pages,7)},(_,i)=>{const p=pages<=7?i+1:(i===0?1:i===1?2:i===5?pages-1:i===6?pages:jobPage);return p===jobPage?`<span class="pill">Page ${p}</span>`:`<button class="btn small" data-job-page="${p}">Page ${p}</button>`;}).join('');
+    $('sideGigList').innerHTML=SIDE_GIGS.map(g=>`<div class="item"><div class="row"><div><h3>${escapeHtml(g.title)}</h3><p>${escapeHtml(g.company)} · flexible shift</p></div><b>${money(g.hourly)}/hr</b></div><div class="controls" style="margin-top:8px"><button class="btn small" data-action="side-gig" data-id="${g.id}" ${state.workedToday>=MAX_WORK_HOURS?'disabled':''}>Work Side Shift</button></div></div>`).join('');
+  }
+
+  function renderCollege(){
+    const e=state.education;const college=e.collegeId?COLLEGES.find(c=>c.id===e.collegeId):null;
+    $('eduSummary').innerHTML=`<div class="tags"><span class="tag">Highest: ${escapeHtml(e.highest)}</span><span class="tag">${escapeHtml(college?.name||'No college')}</span><span class="tag">${escapeHtml(degreeLabel())}</span><span class="tag">Progress ${e.stage&&!e.completed?e.progress.toFixed(0):e.stage?'100':'0'}%</span><span class="tag">Scholarship ${money(state.scholarship)}</span><span class="tag">Loans ${money(state.studentLoan)}</span></div>${e.stage&&!e.completed?`<div class="controls" style="margin-top:9px"><button class="btn small warn" data-action="study-harder">Study Harder</button><button class="btn small" data-action="advance-hour">Advance Hour</button></div>`:''}`;
+    $('degreeSummary').innerHTML=e.stage?`<b>${escapeHtml(e.program||'Program')}</b><p class="muted">${escapeHtml(college?.name||'School')} · ${e.workRestricted&&!e.completed?'Work restricted while enrolled':'Work allowed'}${e.completed?' · Completed':''}</p><div class="progress"><i style="width:${e.completed?100:clamp(e.progress,0,100)}%"></i></div>${e.completed?`<div class="controls" style="margin-top:9px"><span class="pill">Eligible for next credential: ${e.highest==='bachelor'?'Yes':'No'}</span></div>`:''}`:'<div class="empty">Pick a college below to begin.</div>';
+    const search=($('collegeSearch')?.value||'').toLowerCase();const type=$('collegeType')?.value||'all';const rows=COLLEGES.filter(c=>(type==='all'||c.type===type)&&c.name.toLowerCase().includes(search));
+    $('collegeList').innerHTML=rows.map(c=>{const offer=Math.max(state.scholarship,c.tuition*.10);const canApply=!e.stage||e.completed;return `<div class="item"><div class="row"><div><h3>${escapeHtml(c.name)}</h3><p>${c.type.toUpperCase()} · Prestige ${c.prestige.toFixed(2)}x · Admission ${Math.round(c.accept*100)}%</p></div><b>${money(c.tuition)}/yr</b></div><div class="tags"><span class="tag">${c.work?'Work allowed':'Work restricted'}</span><span class="tag">${c.loans?'Student loans eligible':'No student loans'}</span><span class="tag">Scholarship applications</span><span class="tag">Illustrative award ${money(offer)}</span></div><div class="controls" style="margin-top:8px">${canApply?`<button class="btn small primary" data-action="apply-college" data-id="${c.id}">${e.completed?'Apply to new program':'Apply for College'}</button><button class="btn small" data-action="scholarship" data-id="${c.id}">Apply for Scholarship</button>`:'<span class="muted tiny">Finish your current program before enrolling again.</span>'}</div></div>`;}).join('');
+  }
+
+  function renderBusinesses(){
+    const search=($('bizSearch')?.value||'').toLowerCase();const ind=$('bizIndustry')?.value||'all';const sort=$('bizSort')?.value||'cost';let rows=BUSINESSES.filter(b=>(ind==='all'||b.industry===ind)&&`${b.name} ${b.industry}`.toLowerCase().includes(search));
+    rows.sort((a,b)=>sort==='profit'?(b.hourly*b.margin-a.hourly*a.margin):sort==='risk'?(a.margin-b.margin):(a.cost-b.cost));rows=rows.slice(0,140);
+    $('businessList').innerHTML=rows.map(b=>{const price=round2(b.cost*currentCity().econ);return `<div class="item"><div class="row"><div><h3>${escapeHtml(b.name)}</h3><p>${escapeHtml(b.industry)} · Tier ${b.tier}</p></div><b>${money(price)}</b></div><div class="tags"><span class="tag">Est. ${money(b.hourly*b.margin*currentCity().biz)}/hr profit</span><span class="tag">Capital tier ${b.tier}</span><span class="tag">Staff ${b.staff}</span></div><div class="controls" style="margin-top:8px"><button class="btn small primary" data-action="buy-business" data-id="${b.id}">Open Business</button></div></div>`;}).join('');
+    $('ownedBusinesses').innerHTML=state.businesses.length?state.businesses.map(b=>`<div class="item"><div class="row"><div><h3>${escapeHtml(b.name)}</h3><p>${escapeHtml(b.industry)} · ${escapeHtml(getCity(b.locationId).name)}</p></div><span class="pill">${money(b.value)}</span></div><p>Estimated current profit ${money(b.hourly*b.margin*getCity(b.locationId).biz)}/hr · margin ${(b.margin*100).toFixed(0)}% · staff ${number(b.staff)} · manager ${b.manager?'yes':'no'}</p><div class="controls"><button class="btn small" data-action="upgrade-business" data-id="${b.id}">Expand</button>${b.manager?'':'<button class="btn small" data-action="hire-manager" data-id="'+b.id+'">Hire Manager</button>'}</div></div>`).join(''):'<div class="empty">No businesses yet. Start small, then scale through higher capital tiers.</div>';
+  }
+
+  function renderMoney(){
+    $('moneyCards').innerHTML=[['Checking',money(state.cash)],['Savings',money(state.savings)],['401(k)',money(state.retirement)],['IRA',money(state.ira)],['Investments',money(state.investments)],['Student Loans',money(state.studentLoan)]].map(([a,v])=>`<div class="card"><div class="label">${escapeHtml(a)}</div><div class="value">${escapeHtml(v)}</div></div>`).join('');
+    $('loanPanelMount').innerHTML=`<div class="panel"><h3>Student loans</h3><p class="muted">Interest accrues monthly. Pay the balance down whenever you can.</p><div class="row"><span>Balance</span><b>${money(state.studentLoan)}</b></div><input id="loanAmt" class="input" type="number" min="0.01" step="0.01" placeholder="Payment amount" style="margin-top:8px"><div class="controls" style="margin-top:8px"><button class="btn small primary" data-action="pay-loan">Pay Loan</button></div></div>`;
+  }
+
+  function renderHousing(){
+    const search=($('homeSearch')?.value||'').toLowerCase();const type=$('homeType')?.value||'all';const sort=$('homeSort')?.value||'cost';let rows=HOMES.filter(h=>(type==='all'||h.type===type)&&h.name.toLowerCase().includes(search));rows.sort((a,b)=>sort==='quality'?b.quality-a.quality:(a.rent||a.price)-(b.rent||b.price));
+    $('housingList').innerHTML=rows.map(h=>{const cost=h.type==='rent'?h.rent*currentCity().housing:h.price*currentCity().housing;return `<div class="item"><div class="row"><div><h3>${escapeHtml(h.name)}</h3><p>${h.beds} bedroom · Quality ${h.quality.toFixed(1)}</p></div><b>${money(cost)}${h.type==='rent'?'/mo':''}</b></div><div class="controls" style="margin-top:8px">${h.type==='rent'?`<button class="btn small primary" data-action="rent-home" data-id="${h.id}">Rent</button>`:`<button class="btn small primary" data-action="buy-home" data-id="${h.id}">Buy</button><button class="btn small" data-action="buy-rental" data-id="${h.id}">Buy as Rental</button>`}</div></div>`;}).join('');
+    if(state.home){$('homeSummary').innerHTML=`<div class="row"><div><b>${escapeHtml(state.home.name)}</b><p class="muted">${state.home.type==='rent'?money(state.home.monthlyRent)+'/month':'Owned · '+money(state.home.value)}</p></div><span class="pill">${escapeHtml(getCity(state.home.cityId).name)}</span></div><div class="controls" style="margin-top:9px"><button class="btn small bad" data-action="end-home">${state.home.type==='rent'?'End lease':'Sell home'}</button></div>`;}else $('homeSummary').innerHTML='<div class="empty">No home yet. Rent first, then consider buying.</div>';
+    $('rentalList').innerHTML=state.rentals.length?state.rentals.map(r=>`<div class="item"><div class="row"><div><b>${escapeHtml(r.name)}</b><p class="muted">${money(r.monthlyRent)}/month rent · ${escapeHtml(getCity(r.cityId).name)}</p></div><button class="btn small" data-action="sell-rental" data-id="${r.id}">Sell</button></div></div>`).join(''):'<div class="empty">No rental properties owned.</div>';
+  }
+
+  function renderCities(){
+    $('cityList').innerHTML=CITIES.map(c=>{const move=c.id===state.cityId?0:round2((currentCity().moveBase+c.moveBase)*.55*(state.home?.type==='owned'?1.15:1));return `<div class="item"><div class="row"><div><h3>${escapeHtml(c.name)} ${c.id===state.cityId?'<span class="pill">Current</span>':''}</h3><p>${escapeHtml(c.desc)}</p></div><div style="text-align:right"><b>Salary ${c.salary.toFixed(2)}x</b><div class="tiny muted">Tax ${(c.tax*100).toFixed(1)}% · Business ${c.biz.toFixed(2)}x</div></div></div><div class="tags"><span class="tag">Housing ${c.housing.toFixed(2)}x</span><span class="tag">Economy ${c.econ.toFixed(2)}x</span><span class="tag">Move ${c.id===state.cityId?'—':money(move)}</span></div><div class="controls" style="margin-top:8px"><button class="btn small primary" data-action="move-city" data-id="${c.id}" ${c.id===state.cityId?'disabled':''}>Move Here</button></div></div>`;}).join('');
+  }
+
+  function renderResume(){
+    const career=currentCareer();
+    const jobLine=state.job?`${escapeHtml(state.job.title)} — ${escapeHtml(state.job.company)} · ${money(state.job.wage)}/hr`:'No current primary job';
+    const businessLines=state.businesses.map(b=>`${escapeHtml(b.name)} — ${escapeHtml(b.industry)}`).join('<br>')||'None';
+    $('resume').innerHTML=`<div class="resume"><h2 style="margin:0">${escapeHtml(state.playerName)}</h2><div class="muted">${escapeHtml(currentCity().name)} · Age ${state.age}</div><div class="rline"></div><h3>Profile</h3><p>Entrepreneurial professional building experience through work, education, leadership, and business ownership.</p><h3>Education</h3><p>${escapeHtml(degreeLabel())}${state.education.collegeId?` — ${escapeHtml(COLLEGES.find(c=>c.id===state.education.collegeId)?.name||'College')}`:''}</p><h3>Experience</h3><p>${jobLine}<br><span class="muted">Career experience ${state.careerExp.toFixed(1)} · ${career?escapeHtml(career.field):'General'}</span></p><h3>Entrepreneurship</h3><p>${businessLines}</p><h3>Skills</h3><p>General ${state.skills.general.toFixed(1)} · Technical ${state.skills.technical.toFixed(1)} · Management ${state.skills.management.toFixed(1)} · Finance ${state.skills.finance.toFixed(1)} · Healthcare ${state.skills.healthcare.toFixed(1)} · Sales ${state.skills.sales.toFixed(1)}</p></div>`;
+  }
+
+  function renderLife(){
+    $('characterSummary').innerHTML=`<table class="table"><tr><td>Age</td><td>${state.age}</td></tr><tr><td>Simulated time</td><td>${state.totalHours.toLocaleString()} hours</td></tr><tr><td>Education</td><td>${escapeHtml(degreeLabel())}</td></tr><tr><td>Location</td><td>${escapeHtml(currentCity().name)}</td></tr><tr><td>Primary job</td><td>${escapeHtml(state.job?.title||'None')}</td></tr><tr><td>Businesses</td><td>${number(state.businesses.length)}</td></tr><tr><td>Rental properties</td><td>${number(state.rentals.length)}</td></tr><tr><td>Net worth</td><td>${money(totalAssets())}</td></tr></table>`;
+  }
+  function renderAll(){
+    setupFilters();$('nav').innerHTML=navHtml();renderDashboard();renderMoney();renderCollege();renderBusinesses();renderHousing();renderCities();renderResume();renderLife();if(selectedPage==='jobs')renderJobs();qsa('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${selectedPage}`));
+  }
+  function setupFilters(){
+    const field=$('jobField');if(field && !field.dataset.ready){field.innerHTML='<option value="all">All career fields</option>'+Array.from(new Set(CAREERS.map(c=>c.field))).sort().map(f=>`<option value="${escapeAttr(f)}">${escapeHtml(f)}</option>`).join('');field.dataset.ready='1';}
+    const industry=$('bizIndustry');if(industry && !industry.dataset.ready){industry.innerHTML='<option value="all">All industries</option>'+Array.from(new Set(BUSINESSES.map(b=>b.industry))).sort().map(f=>`<option value="${escapeAttr(f)}">${escapeHtml(f)}</option>`).join('');industry.dataset.ready='1';}
+  }
+
+  function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  const escapeAttr=escapeHtml;
+
+  function editResume(){
+    openModal('Resume name',`<p class="muted">This name appears on your generated resume.</p><input id="resumeName" class="input" maxlength="50" value="${escapeAttr(state.playerName)}"><div class="controls" style="margin-top:10px"><button class="btn primary small" data-modal-action="save-name">Save Name</button></div>`);
+  }
+  function printResume(){
+    renderResume();const html=$('resume').innerHTML;const w=window.open('','_blank');if(!w){toast('Your browser blocked the resume window. Allow pop-ups for this page.','warn');return;}w.document.open();w.document.write(`<!doctype html><html><head><title>Resume</title><style>body{font-family:Arial,sans-serif;padding:38px;color:#152334}h2,h3{color:#152d43}.muted{color:#5b6f80}.rline{height:1px;background:#c7d2dc;margin:12px 0}@media print{body{padding:0}}</style></head><body>${html}</body></html>`);w.document.close();w.focus();try{w.print();}catch(e){toast('Resume opened, but printing was blocked by the browser.','warn');}}
+
+  function exportSave(){
+    sanitizeMoneyState();const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`business-simulator-save-${state.age}-${state.month}-${state.day}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Save exported as JSON.','good');
+  }
+  function importSave(){ $('importFile').click(); }
+  function handleImport(file){
+    if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(String(reader.result));const normalized=normalizeState(parsed);applyLoaded(normalized);saveState();renderAll();toast('Save imported successfully.','good');}catch(e){toast('Import failed. That file is not a valid Business Simulator save.','bad');}};reader.onerror=()=>toast('Could not read the selected file.','bad');reader.readAsText(file);}
+  function resetGame(){
+    openModal('Reset your game?',`<p>All local progress will be deleted and you will return to age 18 with $100.</p><div class="controls"><button class="btn bad small" data-modal-action="confirm-reset">Yes, reset</button><button class="btn small" data-action="close-modal">Cancel</button></div>`);
+  }
+  function confirmReset(){try{storage()?.removeItem(SAVE_KEY);}catch(_){ }applyLoaded(normalizeState(INITIAL_STATE));selectedPage='dashboard';closeModal();renderAll();toast('Game reset. You start again with $100.','good');}
+
+  function runDiagnostics(show=true){
+    const results=[];
+    const assert=(name,fn)=>{try{const out=fn();if(out===false)throw new Error('assertion failed');results.push({pass:true,name});}catch(e){results.push({pass:false,name,message:String(e.message||e)});}};
+    const snapshot=deepClone(state);
+    assert('State is finite and normalized',()=>Object.entries(state).filter(([k])=>['cash','age','month','day','hour','totalHours','careerExp','studentLoan','savings','retirement','ira','investments'].includes(k)).every(([,v])=>Number.isFinite(v)));
+    assert('Exactly one primary job maximum',()=>!state.job||typeof state.job==='object');
+    assert('Job catalog is large',()=>JOBS.length>=10000);
+    assert('Procedural universe is over 1M',()=>JOB_UNIVERSE_COUNT>1000000);
+    assert('Company catalog is diversified',()=>new Set(JOBS.map(j=>j.company)).size>=1000);
+    assert('College catalog is diverse',()=>COLLEGES.length>=15);
+    assert('Major catalog exceeds 1000',()=>ALL_MAJORS.length>=1000);
+    assert('Minor catalog exceeds 1000',()=>ALL_MINORS.length>=1000);
+    assert('Business catalog has micro and enterprise tiers',()=>BUSINESSES.some(b=>b.cost<=100)&&BUSINESSES.some(b=>b.cost>=10000000));
+    assert('Housing catalog is populated',()=>HOMES.length>=100);
+    assert('City catalog contains tax-free option',()=>CITIES.some(c=>c.tax===0)&&CITIES.some(c=>c.tax>0));
+    assert('All generated jobs have finite wages',()=>JOBS.every(j=>Number.isFinite(j.hourly)&&j.hourly>0));
+    assert('Qualification returns a bounded score',()=>{const q=qualification(JOBS[0]);return Number.isFinite(q.score)&&q.score>=0&&q.score<=100;});
+    assert('Tax never creates negative positive income',()=>afterTax(100)>=0);
+    assert('Money transfer rejects zero',()=>{const before=state.cash;const result=moneyMove('__invalid__');return result===false&&state.cash===before;});
+    assert('Time key is monotonic',()=>timeKey()>=0&&Number.isInteger(timeKey()));
+    assert('Cooldown is finite',()=>Number.isFinite(cooldownRemaining())&&typeof cooldownText()==='string');
+    assert('Rental values are finite',()=>state.rentals.every(r=>Number.isFinite(r.value)&&Number.isFinite(r.monthlyRent)));
+    assert('Business values are finite',()=>state.businesses.every(b=>Number.isFinite(b.value)&&Number.isFinite(b.hourly)&&Number.isFinite(b.margin)));
+    assert('Net worth is finite',()=>Number.isFinite(totalAssets()));
+    assert('Save serializes',()=>typeof JSON.stringify(state)==='string');
+    assert('Search renderer returns array',()=>Array.isArray(jobSearchResults()));
+    assert('Required UI roots exist',()=>['nav','statsCards','jobList','collegeList','businessList','housingList','cityList','resume','modal','toastbox'].every(id=>!!$(id)));
+    assert('Navigation has all pages',()=>NAV.every(([id])=>!!$(`page-${id}`)));
+    applyLoaded(normalizeState(snapshot));
+    state.diagnostics.lastRun=Date.now();state.diagnostics.passes=results;
+    if(show){
+      const fails=results.filter(r=>!r.pass);openModal('20-pass diagnostics',`<p>${fails.length?'Some diagnostics failed.':'All diagnostics passed.'}</p><table class="table"><tr><th>Status</th><th>Check</th></tr>${results.map(r=>`<tr><td class="${r.pass?'badge-ok':'badge-bad'}">${r.pass?'PASS':'FAIL'}</td><td>${escapeHtml(r.name)}${r.message?`<div class="tiny muted">${escapeHtml(r.message)}</div>`:''}</td></tr>`).join('')}</table>`);
+    }
+    return results.every(r=>r.pass);
+  }
+
+  function handleAction(action,id){
+    switch(action){
+      case 'advance-hour': advanceOneHour({source:'time',notify:true});break;
+      case 'work-hour': workOneHour(false);break;
+      case 'work-harder': workOneHour(true);break;
+      case 'apply-job': applyJob(id);break;
+      case 'quit-job': quitJob();break;
+      case 'refresh-jobs': jobPage=1;renderJobs();break;
+      case 'side-gig': workSideGig(id);break;
+      case 'study-harder': studyHarder();break;
+      case 'apply-college': openCollegeModal(id);break;
+      case 'scholarship': applyScholarship(id);break;
+      case 'refresh-businesses': renderBusinesses();break;
+      case 'buy-business': buyBusiness(id);break;
+      case 'upgrade-business': upgradeBusiness(id);break;
+      case 'hire-manager': hireManager(id);break;
+      case 'rent-home': rentHome(id);break;
+      case 'buy-home': buyHome(id);break;
+      case 'buy-rental': buyRental(id);break;
+      case 'sell-rental': sellRental(id);break;
+      case 'end-home': endLeaseOrSellHome();break;
+      case 'move-city': moveCity(id);break;
+      case 'pay-loan': payStudentLoan();break;
+      case 'edit-resume': editResume();break;
+      case 'print-resume': printResume();break;
+      case 'save': manualSave();break;
+      case 'diagnostics': runDiagnostics(true);break;
+      case 'export': exportSave();break;
+      case 'import': importSave();break;
+      case 'reset': resetGame();break;
+      case 'close-modal': closeModal();break;
+    }
+  }
+
+  document.addEventListener('click',(event)=>{
+    const pageButton=event.target.closest('[data-page]');if(pageButton){showPage(pageButton.dataset.page);return;}
+    const actionButton=event.target.closest('[data-action]');if(actionButton){handleAction(actionButton.dataset.action,actionButton.dataset.id);return;}
+    const moneyButton=event.target.closest('[data-money]');if(moneyButton){moneyMove(moneyButton.dataset.money);return;}
+    const modalAction=event.target.closest('[data-modal-action]');
+    if(modalAction){
+      const action=modalAction.dataset.modalAction;
+      if(action==='start-bachelor') startBachelor(modalAction.dataset.collegeId);
+      else if(action==='start-advanced') startAdvancedProgram(modalAction.dataset.collegeId,modalAction.dataset.programId);
+      else if(action==='save-name'){const n=capText($('resumeName')?.value,50).trim();if(!n){toast('Enter a name.','bad');return;}state.playerName=n;saveState();closeModal();renderResume();toast('Resume name updated.','good');}
+      else if(action==='confirm-reset') confirmReset();
+      return;
+    }
+    const jobPageButton=event.target.closest('[data-job-page]');if(jobPageButton){jobPage=Number(jobPageButton.dataset.jobPage)||1;renderJobs();return;}
+    if(event.target?.id==='modal') closeModal();
+  });
+
+  ['jobSearch','jobField','jobEdu'].forEach(id=>$(id)?.addEventListener(id==='jobSearch'?'input':'change',()=>{jobPage=1;renderJobs();}));
+  ['collegeSearch','collegeType'].forEach(id=>$(id)?.addEventListener(id==='collegeSearch'?'input':'change',renderCollege));
+  ['bizSearch','bizIndustry','bizSort'].forEach(id=>$(id)?.addEventListener(id==='bizSearch'?'input':'change',renderBusinesses));
+  ['homeSearch','homeType','homeSort'].forEach(id=>$(id)?.addEventListener(id==='homeSearch'?'input':'change',renderHousing));
+  $('importFile').addEventListener('change',e=>{handleImport(e.target.files?.[0]);e.target.value='';});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('modal').classList.contains('open'))closeModal();});
+  window.addEventListener('beforeunload',()=>saveState(true));
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveState(true);});
+
+  let lastHeartbeat=Date.now();
+  const heartbeat=setInterval(()=>{
+    const now=Date.now();
+    if(now-lastHeartbeat>6*60*60*1000) lastHeartbeat=now;
+    updateClock();
+    if(Date.now()-(state.lastSavedAt||0)>30000) saveState(true);
+  },1000);
+  window.addEventListener('beforeunload',()=>clearInterval(heartbeat));
+
+  loadState();
+  setupFilters();
+  renderAll();
+
+  window.BusinessSimulator={
+    version:APP_VERSION,state,advanceOneHour,workOneHour,workSideGig,applyJob,quitJob,startBachelor,startAdvancedProgram,studyHarder,buyBusiness,upgradeBusiness,hireManager,rentHome,buyHome,buyRental,sellRental,moveCity,moneyMove,payStudentLoan,runDiagnostics,showPage
+  };
+  window.__BS_TEST__={
+    state,constants:{MAX_WORK_HOURS,OVERTIME_START,HARDER_COOLDOWN},catalogs:{JOBS,CAREERS,COLLEGES,ALL_MAJORS,ALL_MINORS,BUSINESSES,HOMES,SIDE_GIGS,CITIES},functions:{normalizeState,qualification,totalAssets,jobSearchResults,timeKey,cooldownRemaining,afterTax},resetForTests:()=>{applyLoaded(normalizeState(INITIAL_STATE));renderAll();},saveState,loadState
+  };
+})();
+</script>
+</body>
+</html>
