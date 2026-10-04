@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070b14">
+<title>Business Simulator — Ultimate Edition</title>
+<style>
+:root{
+  --bg:#050811;--panel:rgba(12,18,32,.82);--panel2:rgba(17,25,43,.9);--line:rgba(255,255,255,.09);
+  --text:#f5f7ff;--muted:#8e9ab3;--blue:#69a7ff;--blue2:#4c6fff;--green:#41e6a3;--red:#ff687c;
+  --gold:#ffd369;--purple:#b08cff;--cyan:#63d9ff;--shadow:0 18px 65px rgba(0,0,0,.4);--radius:20px
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);min-height:100vh;background:
+  radial-gradient(circle at 12% 0%,rgba(74,123,255,.18),transparent 28%),
+  radial-gradient(circle at 86% 4%,rgba(128,74,255,.16),transparent 27%),
+  radial-gradient(circle at 50% 100%,rgba(28,180,220,.07),transparent 30%),
+  linear-gradient(180deg,#071020 0%,#04070d 100%)}
+button,input,select{font:inherit}button{color:inherit;cursor:pointer;border:0}button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.app{width:min(1550px,100%);margin:auto;padding:16px}.glass{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:var(--radius)}
+.topbar{position:sticky;top:10px;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 16px;margin-bottom:13px}.brand{display:flex;align-items:center;gap:12px}.logo{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#3e86ff,#7352ff);box-shadow:0 10px 28px rgba(75,109,255,.25);font-size:22px}.brand h1{font-size:20px;letter-spacing:.1px}.brand small{color:var(--muted);font-size:12px}.top-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.btn{padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid var(--line);transition:.16s;white-space:nowrap}.btn:hover{background:rgba(255,255,255,.11);transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,#3d83ff,#6654ff);border-color:transparent}.btn.green{background:rgba(65,230,163,.11);border-color:rgba(65,230,163,.25)}.btn.red{background:rgba(255,104,124,.10);border-color:rgba(255,104,124,.23)}.btn.gold{background:rgba(255,211,105,.10);border-color:rgba(255,211,105,.23)}.btn.purple{background:rgba(176,140,255,.11);border-color:rgba(176,140,255,.25)}
+.stats{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-bottom:13px}.stat{padding:12px 13px;min-width:0}.stat span{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}.stat strong{font-size:18px;font-variant-numeric:tabular-nums}.green-text{color:var(--green)}.red-text{color:var(--red)}.gold-text{color:var(--gold)}.purple-text{color:var(--purple)}.cyan-text{color:var(--cyan)}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.tab{padding:9px 12px;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:12px;color:var(--muted)}.tab.active{color:#fff;background:rgba(105,167,255,.15);border-color:rgba(105,167,255,.35)}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:13px}.stack{display:grid;gap:13px}.panel{padding:17px}.panel h2{font-size:16px;margin-bottom:11px}.panel h3{font-size:14px;margin-bottom:7px}.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}.hidden{display:none!important}
+.time-card{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}.clock{font-size:43px;font-weight:850;letter-spacing:-1.6px}.date{color:var(--muted);margin-top:2px}.next-hour{width:min(335px,100%);padding:18px;border-radius:18px;background:linear-gradient(135deg,#3a81ff,#6851ff);font-size:18px;font-weight:850;box-shadow:0 13px 35px rgba(58,97,255,.25)}.next-hour span{display:block;margin-top:4px;font-size:11px;font-weight:500;opacity:.78}
+.action-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);font-size:11px;color:#cdd7ea}.pill.blue{background:rgba(105,167,255,.12);color:#bcd5ff}.pill.green{background:rgba(65,230,163,.1);color:#95f1ca}.pill.red{background:rgba(255,104,124,.1);color:#ffc1cb}.pill.gold{background:rgba(255,211,105,.1);color:#ffe7a3}.pill.purple{background:rgba(176,140,255,.1);color:#dbc9ff}
+.progress{height:9px;background:rgba(255,255,255,.055);border-radius:999px;overflow:hidden}.bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#4d8cff,#67d8ff)}.bar.green{background:linear-gradient(90deg,#37c98c,#6de6b5)}.bar.purple{background:linear-gradient(90deg,#8b69ff,#c19cff)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row-left{min-width:0}.row-title{font-weight:760}.row-sub{font-size:11px;color:var(--muted);margin-top:2px}.item{padding:12px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.026);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.item+.item{margin-top:7px}.item:hover{background:rgba(255,255,255,.045)}.item-title{font-weight:780}.item-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45}.item-meta{text-align:right;min-width:105px}.item-meta strong{display:block;margin-bottom:6px;font-variant-numeric:tabular-nums}.empty{padding:25px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px}.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.kpi{padding:13px;border:1px solid var(--line);background:rgba(255,255,255,.026);border-radius:14px}.kpi strong{font-size:17px}.catalog-tools{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:7px;margin-bottom:10px}.catalog{max-height:665px;overflow:auto;padding-right:3px}.log{max-height:370px;overflow:auto}.log-item{padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.45}.log-time{color:var(--muted);font-size:10px;margin-right:6px}.section-note{padding:10px 11px;border-radius:12px;background:rgba(105,167,255,.055);border:1px solid rgba(105,167,255,.11);font-size:11px;color:#b7c5dd;line-height:1.5;margin-bottom:11px}.warning{padding:10px 11px;border-radius:12px;background:rgba(255,104,124,.06);border:1px solid rgba(255,104,124,.13);font-size:11px;color:#ffc5ce;line-height:1.5;margin-bottom:11px}
+input,select,textarea{width:100%;background:rgba(255,255,255,.042);color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 11px;outline:none}.input-label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}.field{margin-bottom:9px}select option{background:#0a1120;color:#fff}input:focus,select:focus,textarea:focus{border-color:rgba(105,167,255,.55)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{width:100%;border-collapse:collapse;min-width:600px}.table th,.table td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-size:11px}.table th{color:var(--muted);font-weight:600;background:rgba(255,255,255,.028);position:sticky;top:0}.table tr:last-child td{border-bottom:0}
+.stat-line{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:6px 0}.stat-line span:first-child{color:var(--muted)}.badge{display:inline-grid;place-items:center;width:29px;height:29px;border-radius:9px;background:rgba(255,211,105,.11);border:1px solid rgba(255,211,105,.2);margin-right:8px}.achievement{display:flex;gap:0;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.achievement:last-child{border-bottom:0}
+.salary-big{font-size:27px;font-weight:850}.resume{background:#f7f9ff;color:#101727;border-radius:14px;padding:25px;line-height:1.45;font-family:Georgia,"Times New Roman",serif}.resume h1{font-family:Inter,Arial,sans-serif;font-size:29px;margin-bottom:2px}.resume .resume-contact{font-family:Inter,Arial,sans-serif;color:#52607a;font-size:12px;margin-bottom:16px}.resume h2{font-family:Inter,Arial,sans-serif;font-size:13px;color:#243657;letter-spacing:.5px;border-bottom:1px solid #d9dfeb;padding-bottom:5px;margin:14px 0 7px}.resume p,.resume li{font-size:12px}.resume ul{padding-left:20px}.resume-actions{margin-bottom:10px;display:flex;gap:7px;flex-wrap:wrap}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}.modal-card{width:min(780px,100%);max-height:92vh;overflow:auto;padding:18px}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.modal-head h2{font-size:17px}.close{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.06)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:150;width:min(390px,calc(100% - 32px))}.toast .msg{padding:12px 14px;border-radius:13px;background:#101a2b;border:1px solid var(--line);box-shadow:var(--shadow);margin-top:7px;font-size:12px;line-height:1.45}
+hr.sep{border:0;border-top:1px solid var(--line);margin:13px 0}
+@media(max-width:1200px){.stats{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:1fr}.topbar{position:relative;top:0}}
+@media(max-width:750px){.app{padding:10px}.stats{grid-template-columns:repeat(2,1fr)}.catalog-tools{grid-template-columns:1fr}.time-card{grid-template-columns:1fr}.clock{font-size:34px}.two-col,.three-col{grid-template-columns:1fr}.item{grid-template-columns:1fr}.item-meta{text-align:left}.item-meta .btn{margin-top:4px}.brand small{display:none}.topbar{align-items:flex-start}.top-actions{max-width:50%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar glass">
+    <div class="brand"><div class="logo">💼</div><div><h1>Business Simulator — Ultimate</h1><small>Start at 18. Build a career. Build companies. Build a fortune.</small></div></div>
+    <div class="top-actions"><button class="btn" onclick="saveGame()">Save</button><button class="btn" onclick="openProfile()">Profile</button><button class="btn red" onclick="resetGame()">Reset</button></div>
+  </header>
+
+  <section class="stats">
+    <div class="stat glass"><span>Cash</span><strong id="cashStat" class="green-text">$100.00</strong></div>
+    <div class="stat glass"><span>Checking</span><strong id="checkingStat">$0.00</strong></div>
+    <div class="stat glass"><span>Savings</span><strong id="savingsStat">$0.00</strong></div>
+    <div class="stat glass"><span>Retirement</span><strong id="retireStat" class="purple-text">$0.00</strong></div>
+    <div class="stat glass"><span>Net Worth</span><strong id="netWorthStat" class="gold-text">$100.00</strong></div>
+    <div class="stat glass"><span>Income / Hour</span><strong id="incomeStat" class="green-text">$0.00</strong></div>
+    <div class="stat glass"><span>Credit Score</span><strong id="creditStat" class="cyan-text">650</strong></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="home">Overview</button>
+    <button class="tab" data-tab="career">Career</button>
+    <button class="tab" data-tab="college">College</button>
+    <button class="tab" data-tab="business">Businesses</button>
+    <button class="tab" data-tab="money">Money</button>
+    <button class="tab" data-tab="life">Life</button>
+    <button class="tab" data-tab="resume">Resume</button>
+    <button class="tab" data-tab="activity">Activity</button>
+  </nav>
+
+  <main>
+    <section id="tab-home" class="tab-page">
+      <div class="grid">
+        <div class="stack">
+          <div class="panel glass time-card">
+            <div>
+              <div id="clock" class="clock">8:00 AM</div>
+              <div id="dateLine" class="date">Age 18 • Day 1 • Year 1 • Monday</div>
+              <div class="action-row"><span id="jobStatusPill" class="pill">No job</span><span id="overtimePill" class="pill">Overtime unavailable</span><span id="collegePill" class="pill">Not enrolled</span></div>
+            </div>
+            <button class="next-hour" onclick="advanceHour()">＋ 1 Hour<span>Advance one hour — wages, school, business operations and life continue.</span></button>
+          </div>
+
+          <div class="panel glass">
+            <h2>Today at a glance</h2>
+            <div class="two-col">
+              <div class="kpi"><div class="small muted">Work hours today</div><strong id="hoursKpi">0 / 8</strong><div class="progress" style="margin-top:7px"><div id="workBar" class="bar" style="width:0%"></div></div></div>
+              <div class="kpi"><div class="small muted">Performance</div><strong id="performanceKpi">50%</strong><div class="progress" style="margin-top:7px"><div id="performanceBar" class="bar green" style="width:50%"></div></div></div>
+              <div class="kpi"><div class="small muted">Daily living cost</div><strong id="dailyExpenseKpi">$0.00</strong></div>
+              <div class="kpi"><div class="small muted">Businesses owned</div><strong id="businessCountKpi">0</strong></div>
+            </div>
+          </div>
+
+          <div class="panel glass"><h2>Current Career</h2><div id="currentJob"></div></div>
+          <div class="panel glass"><h2>Business Empire</h2><div id="homeBusinesses"></div></div>
+        </div>
+
+        <div class="stack">
+          <div class="panel glass"><h2>Long-Term Progress</h2><div id="longProgress"></div></div>
+          <div class="panel glass"><h2>Recent Events</h2><div id="homeLog" class="log"></div></div>
+          <div class="panel glass"><h2>Achievements</h2><div id="achievements"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-career" class="tab-page hidden">
+      <div class="grid">
+        <div class="panel glass">
+          <h2>Job Market</h2>
+          <div class="section-note">You may hold <strong>one job at a time</strong>. Many careers require education, experience, licensing, or all three. Higher positions become dramatically harder to reach. Businesses are separate from your job and do not require a college degree to own.</div>
+          <div class="catalog-tools">
+            <input id="jobSearch" placeholder="Search: neurosurgeon, cashier, CFO, engineer..." oninput="renderJobs()">
+            <select id="jobCategory" onchange="renderJobs()"></select>
+            <select id="jobSort" onchange="renderJobs()"><option value="pay">Highest pay</option><option value="low">Lowest pay</option><option value="name">Name</option><option value="education">Lowest education</option><option value="executive">Executive potential</option></select>
+          </div>
+          <div class="small muted" id="jobCount"></div>
+          <div id="jobCatalog" class="catalog"></div>
+        </div>
+        <div class="stack">
+          <div class="panel glass"><h2>Your Career</h2><div id="careerCard"></div></div>
+          <div class="panel glass"><h2>Work Harder</h2><div id="workHarderCard"></div></div>
+          <div class="panel glass"><h2>Promotion Track</h2><div id="promotionTrack"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-college" class="tab-page hidden">
+      <div class="grid">
+        <div class="panel glass">
+          <h2>College & Education</h2>
+          <div class="section-note">College uses a semester system. You can work while studying, but overlapping work and class hours reduces attendance and performance. Tuition is paid by semester. Your major and minor become part of your resume.</div>
+          <div id="collegeStatus"></div>
+          <hr class="sep">
+          <h3>Choose a school</h3>
+          <div class="catalog-tools"><input id="schoolSearch" placeholder="Search colleges..." oninput="renderSchools()"><select id="schoolType" onchange="renderSchools()"><option value="">All types</option><option>Community College</option><option>Public University</option><option>Private University</option><option>Technical Institute</option><option>Elite University</option></select></div>
+          <div id="schoolCatalog" class="catalog" style="max-height:480px"></div>
+        </div>
+        <div class="stack">
+          <div class="panel glass"><h2>Majors</h2><div id="majorCatalog"></div></div>
+          <div class="panel glass"><h2>Minors</h2><div id="minorCatalog"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-business" class="tab-page hidden">
+      <div class="grid">
+        <div class="panel glass">
+          <h2>Business Marketplace</h2>
+          <div class="section-note">Ownership is capital-driven, not degree-driven. Small businesses can start with your own money; advanced businesses require much larger capital, operating reserves, licensing/experience, and increasingly serious management capacity. There is no artificial "everything is affordable" rule.</div>
+          <div class="catalog-tools"><input id="bizSearch" placeholder="Search businesses: bank, dumpster, restaurant, airline..." oninput="renderBusinesses()"><select id="bizCategory" onchange="renderBusinesses()"></select><select id="bizSort" onchange="renderBusinesses()"><option value="tier">Tier</option><option value="startup">Lowest startup</option><option value="profit">Highest hourly profit</option><option value="roi">Best ROI</option><option value="name">Name</option></select></div>
+          <div class="small muted" id="bizCount"></div>
+          <div id="bizCatalog" class="catalog"></div>
+        </div>
+        <div class="stack">
+          <div class="panel glass"><h2>Your Businesses</h2><div id="ownedBusinesses"></div></div>
+          <div class="panel glass"><h2>Business Metrics</h2><div id="businessMetrics"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-money" class="tab-page hidden">
+      <div class="grid">
+        <div class="stack">
+          <div class="panel glass"><h2>Banking</h2><div id="accounts"></div><hr class="sep"><div class="two-col"><div class="field"><label class="input-label">Amount</label><input id="moneyAmount" type="number" min="1" step="1" value="100"></div><div class="field"><label class="input-label">Transfer</label><select id="moneyAction"><option value="cashToChecking">Cash → Checking</option><option value="checkingToCash">Checking → Cash</option><option value="checkingToSavings">Checking → Savings</option><option value="savingsToChecking">Savings → Checking</option><option value="checkingToRetirement">Checking → Retirement</option><option value="retirementToChecking">Retirement → Checking</option></select></div></div><button class="btn primary" onclick="moveMoney()">Transfer</button></div>
+          <div class="panel glass"><h2>Retirement & Investing</h2><div id="investmentCard"></div></div>
+          <div class="panel glass"><h2>Loans & Credit</h2><div id="loanCard"></div></div>
+        </div>
+        <div class="stack">
+          <div class="panel glass"><h2>Financial Health</h2><div id="financialHealth"></div></div>
+          <div class="panel glass"><h2>Housing & Transportation</h2><div id="housingCard"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-life" class="tab-page hidden">
+      <div class="grid">
+        <div class="stack">
+          <div class="panel glass"><h2>Life & Skills</h2><div id="skillsCard"></div></div>
+          <div class="panel glass"><h2>Location</h2><div class="section-note">Moving changes your taxes, wages/demand, business economics, housing costs, and sometimes access requirements. A move has a real in-game relocation cost and a cooldown.</div><div id="locationCard"></div></div>
+        </div>
+        <div class="stack">
+          <div class="panel glass"><h2>Living Expenses</h2><div id="livingCard"></div></div>
+          <div class="panel glass"><h2>Life Events</h2><div id="settingsCard"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-resume" class="tab-page hidden">
+      <div class="panel glass">
+        <div class="resume-actions"><button class="btn primary" onclick="copyResume()">Copy Resume</button><button class="btn" onclick="window.print()">Print / Save PDF</button><button class="btn" onclick="openProfile()">Edit Profile</button></div>
+        <div id="resumePreview"></div>
+      </div>
+    </section>
+
+    <section id="tab-activity" class="tab-page hidden">
+      <div class="grid">
+        <div class="panel glass"><h2>Full Activity Log</h2><div id="fullLog" class="log"></div></div>
+        <div class="stack"><div class="panel glass"><h2>Statistics</h2><div id="statsCard"></div></div><div class="panel glass"><h2>Game Rules</h2><div class="small muted" style="line-height:1.6">Hourly simulation • one job at a time • 6-hour Work Harder cooldown • maximum 4 overtime hours per day • promotion gates get harder at higher levels • business prices increase sharply by tier • college uses semesters • moves cost money and require a cooldown • taxes and investment returns are simulated game mechanics.</div></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modal-card glass"><div class="modal-head"><h2 id="modalTitle">Details</h2><button class="close" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+
+const SAVE_KEY='businessSimulatorUltimateV2';
+const WEEKDAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
+const num=n=>Number.isFinite(n)?n:0;
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const fmtInt=n=>Math.round(n).toLocaleString();
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleepH=(h)=>h>=22||h<6;
+const isWeekday=day=>((day-1)%7)<5;
+const currentWeekday=()=>WEEKDAYS[(state.day-1)%7];
+
+/* ----------------------------- CAREER DATA ----------------------------- */
+
+const canonicalJobs=[
+  {name:'Cashier',category:'Retail',wage:15,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Walmart Cashier',category:'Retail',wage:16,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Target Cashier',category:'Retail',wage:16,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Cart Pusher',category:'Retail',wage:15,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Stock Associate',category:'Retail',wage:16,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Retail Sales Associate',category:'Retail',wage:18,education:'No degree',educationLevel:0,track:'Retail',tier:0},
+  {name:'Barista',category:'Food',wage:16,education:'No degree',educationLevel:0,track:'Food',tier:0},
+  {name:'Restaurant Server',category:'Food',wage:18,education:'No degree',educationLevel:0,track:'Food',tier:0},
+  {name:'Cook',category:'Food',wage:19,education:'No degree',educationLevel:0,track:'Food',tier:0},
+  {name:'Line Cook',category:'Food',wage:20,education:'No degree',educationLevel:0,track:'Food',tier:0},
+  {name:'Dishwasher',category:'Food',wage:15,education:'No degree',educationLevel:0,track:'Food',tier:0},
+  {name:'Delivery Driver',category:'Transportation',wage:21,education:'Driver License',educationLevel:0,track:'Transportation',tier:0,license:'Driver License'},
+  {name:'Warehouse Worker',category:'Logistics',wage:19,education:'No degree',educationLevel:0,track:'Logistics',tier:0},
+  {name:'Package Handler',category:'Logistics',wage:18,education:'No degree',educationLevel:0,track:'Logistics',tier:0},
+  {name:'Forklift Operator',category:'Logistics',wage:23,education:'Certification',educationLevel:1,track:'Logistics',tier:1},
+  {name:'Janitor',category:'Facilities',wage:18,education:'No degree',educationLevel:0,track:'Facilities',tier:0},
+  {name:'Custodian',category:'Facilities',wage:19,education:'No degree',educationLevel:0,track:'Facilities',tier:0},
+  {name:'Landscaper',category:'Outdoor',wage:21,education:'No degree',educationLevel:0,track:'Outdoor',tier:0},
+  {name:'Construction Laborer',category:'Construction',wage:23,education:'No degree',educationLevel:0,track:'Construction',tier:0},
+  {name:'Electrician',category:'Construction',wage:39,education:'Trade School',educationLevel:2,track:'Construction',tier:2},
+  {name:'Plumber',category:'Construction',wage:41,education:'Trade School',educationLevel:2,track:'Construction',tier:2},
+  {name:'HVAC Technician',category:'Construction',wage:37,education:'Trade School',educationLevel:2,track:'Construction',tier:2},
+  {name:'Welder',category:'Construction',wage:33,education:'Trade School',educationLevel:2,track:'Construction',tier:2},
+  {name:'Auto Mechanic',category:'Automotive',wage:32,education:'Associate Degree / Trade',educationLevel:2,track:'Automotive',tier:2},
+  {name:'Dental Assistant',category:'Healthcare',wage:24,education:'Certificate',educationLevel:1,track:'Healthcare',tier:1},
+  {name:'Medical Assistant',category:'Healthcare',wage:26,education:'Certificate',educationLevel:1,track:'Healthcare',tier:1},
+  {name:'Pharmacy Technician',category:'Healthcare',wage:25,education:'Certificate',educationLevel:1,track:'Healthcare',tier:1},
+  {name:'Registered Nurse',category:'Healthcare',wage:43,education:'Nursing Degree',educationLevel:4,track:'Healthcare',tier:4},
+  {name:'Paramedic',category:'Healthcare',wage:35,education:'Associate Degree',educationLevel:3,track:'Healthcare',tier:3},
+  {name:'Physical Therapist',category:'Healthcare',wage:50,education:'Doctorate',educationLevel:6,track:'Healthcare',tier:6},
+  {name:'Pharmacist',category:'Healthcare',wage:67,education:'PharmD',educationLevel:6,track:'Healthcare',tier:6},
+  {name:'Physician',category:'Healthcare',wage:105,education:'Medical Degree + Residency',educationLevel:8,track:'Healthcare',tier:7},
+  {name:'Neurosurgeon',category:'Healthcare',wage:175,education:'Medical Degree + Residency',educationLevel:8,track:'Healthcare',tier:8},
+  {name:'Software Engineer',category:'Technology',wage:63,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:4},
+  {name:'Cybersecurity Analyst',category:'Technology',wage:59,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:4},
+  {name:'Data Analyst',category:'Technology',wage:50,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:3},
+  {name:'Data Scientist',category:'Technology',wage:75,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:5},
+  {name:'Web Developer',category:'Technology',wage:47,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:3},
+  {name:'Game Developer',category:'Technology',wage:49,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:3},
+  {name:'IT Support Specialist',category:'Technology',wage:31,education:'Certificate',educationLevel:1,track:'Technology',tier:1},
+  {name:'Network Engineer',category:'Technology',wage:57,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:4},
+  {name:'UX Designer',category:'Technology',wage:48,education:'Bachelor Degree',educationLevel:4,track:'Technology',tier:4},
+  {name:'Accountant',category:'Business',wage:43,education:'Bachelor Degree',educationLevel:4,track:'Corporate Finance',tier:3},
+  {name:'Financial Analyst',category:'Finance',wage:60,education:'Bachelor Degree',educationLevel:4,track:'Corporate Finance',tier:3},
+  {name:'Bank Teller',category:'Finance',wage:23,education:'No degree / Training',educationLevel:0,track:'Banking',tier:0},
+  {name:'Loan Officer',category:'Finance',wage:36,education:'Bachelor Degree',educationLevel:4,track:'Banking',tier:3},
+  {name:'Investment Analyst',category:'Finance',wage:68,education:'Bachelor Degree',educationLevel:4,track:'Banking',tier:4},
+  {name:'Real Estate Agent',category:'Real Estate',wage:39,education:'License',educationLevel:0,track:'Real Estate',tier:1,license:'Real Estate'},
+  {name:'Property Manager',category:'Real Estate',wage:43,education:'License / Experience',educationLevel:0,track:'Real Estate',tier:2,license:'Property Manager'},
+  {name:'Sales Representative',category:'Business',wage:34,education:'No degree / Training',educationLevel:0,track:'Sales',tier:0},
+  {name:'Marketing Specialist',category:'Business',wage:37,education:'Bachelor Degree',educationLevel:4,track:'Marketing',tier:3},
+  {name:'Project Manager',category:'Business',wage:57,education:'Bachelor Degree + Experience',educationLevel:4,track:'Corporate Management',tier:4},
+  {name:'Human Resources Specialist',category:'Business',wage:40,education:'Bachelor Degree',educationLevel:4,track:'Corporate Management',tier:3},
+  {name:'Recruiter',category:'Business',wage:39,education:'Bachelor Degree / Experience',educationLevel:2,track:'Corporate Management',tier:2},
+  {name:'Teacher',category:'Education',wage:39,education:'Education Degree + License',educationLevel:4,track:'Education',tier:3},
+  {name:'Professor',category:'Education',wage:66,education:'Graduate Degree',educationLevel:6,track:'Education',tier:7},
+  {name:'Paralegal',category:'Legal',wage:36,education:'Associate Degree',educationLevel:3,track:'Legal',tier:2},
+  {name:'Lawyer',category:'Legal',wage:84,education:'Law Degree',educationLevel:8,track:'Legal',tier:5},
+  {name:'Police Officer',category:'Public Service',wage:35,education:'Academy',educationLevel:1,track:'Public Service',tier:1},
+  {name:'Firefighter',category:'Public Service',wage:35,education:'Academy',educationLevel:1,track:'Public Service',tier:1},
+  {name:'Pilot',category:'Transportation',wage:82,education:'Pilot License + Experience',educationLevel:4,track:'Aviation',tier:5},
+  {name:'Flight Attendant',category:'Transportation',wage:31,education:'Certification',educationLevel:1,track:'Aviation',tier:1},
+  {name:'Journalist',category:'Media',wage:33,education:'Bachelor Degree',educationLevel:4,track:'Media',tier:3},
+  {name:'Photographer',category:'Media',wage:29,education:'Portfolio',educationLevel:0,track:'Creative',tier:1},
+  {name:'Video Editor',category:'Media',wage:36,education:'Portfolio',educationLevel:0,track:'Creative',tier:2},
+  {name:'Actor',category:'Entertainment',wage:27,education:'Audition',educationLevel:0,track:'Creative',tier:1},
+  {name:'Musician',category:'Entertainment',wage:26,education:'Portfolio',educationLevel:0,track:'Creative',tier:1},
+  {name:'Graphic Designer',category:'Creative',wage:36,education:'Bachelor Degree / Portfolio',educationLevel:4,track:'Creative',tier:3},
+  {name:'Architect',category:'Architecture',wage:55,education:'Architecture Degree + License',educationLevel:6,track:'Architecture',tier:5},
+  {name:'Civil Engineer',category:'Engineering',wage:60,education:'Engineering Degree',educationLevel:4,track:'Engineering',tier:5},
+  {name:'Mechanical Engineer',category:'Engineering',wage:62,education:'Engineering Degree',educationLevel:4,track:'Engineering',tier:5},
+  {name:'Chemical Engineer',category:'Engineering',wage:66,education:'Engineering Degree',educationLevel:4,track:'Engineering',tier:5},
+  {name:'Aerospace Engineer',category:'Engineering',wage:74,education:'Engineering Degree',educationLevel:4,track:'Engineering',tier:6},
+  {name:'Research Scientist',category:'Science',wage:57,education:'Graduate Degree',educationLevel:6,track:'Research',tier:6},
+  {name:'Biologist',category:'Science',wage:45,education:'Bachelor Degree',educationLevel:4,track:'Research',tier:4},
+  {name:'Chemist',category:'Science',wage:48,education:'Bachelor Degree',educationLevel:4,track:'Research',tier:4},
+  {name:'Lab Technician',category:'Science',wage:27,education:'Associate Degree',educationLevel:3,track:'Research',tier:2},
+  {name:'Farmer',category:'Agriculture',wage:25,education:'No degree',educationLevel:0,track:'Agriculture',tier:0},
+  {name:'Veterinary Assistant',category:'Animal Care',wage:22,education:'Certificate',educationLevel:1,track:'Animal Care',tier:1},
+  {name:'Veterinarian',category:'Animal Care',wage:76,education:'Veterinary Degree',educationLevel:8,track:'Animal Care',tier:7},
+  {name:'Dog Walker',category:'Animal Care',wage:18,education:'No degree',educationLevel:0,track:'Animal Care',tier:0},
+  {name:'Barber',category:'Personal Services',wage:29,education:'License',educationLevel:0,track:'Personal Services',tier:1,license:'Barber'},
+  {name:'Hairstylist',category:'Personal Services',wage:30,education:'License',educationLevel:0,track:'Personal Services',tier:1,license:'Cosmetology'},
+  {name:'Fitness Trainer',category:'Personal Services',wage:31,education:'Certification',educationLevel:1,track:'Personal Services',tier:2},
+  {name:'Translator',category:'Languages',wage:35,education:'Certificate / Degree',educationLevel:2,track:'Languages',tier:2},
+  {name:'Customer Support Specialist',category:'Customer Service',wage:23,education:'No degree',educationLevel:0,track:'Customer Service',tier:0},
+  {name:'Call Center Representative',category:'Customer Service',wage:20,education:'No degree',educationLevel:0,track:'Customer Service',tier:0},
+  {name:'Truck Driver',category:'Transportation',wage:29,education:'CDL',educationLevel:1,track:'Transportation',tier:2,license:'CDL'},
+  {name:'Air Traffic Controller',category:'Aviation',wage:67,education:'Specialized Training',educationLevel:2,track:'Aviation',tier:5},
+  {name:'Pharmaceutical Scientist',category:'Pharmaceuticals',wage:64,education:'Graduate Degree',educationLevel:6,track:'Research',tier:6},
+  {name:'Physician Assistant',category:'Healthcare',wage:62,education:'Graduate Degree',educationLevel:6,track:'Healthcare',tier:5},
+  {name:'Dentist',category:'Healthcare',wage:89,education:'Dental Degree',educationLevel:8,track:'Healthcare',tier:7},
+  {name:'Optometrist',category:'Healthcare',wage:70,education:'Doctorate',educationLevel:8,track:'Healthcare',tier:7},
+  {name:'Occupational Therapist',category:'Healthcare',wage:48,education:'Graduate Degree',educationLevel:6,track:'Healthcare',tier:5},
+  {name:'Clinical Research Coordinator',category:'Healthcare',wage:34,education:'Bachelor Degree',educationLevel:4,track:'Healthcare',tier:3},
+  {name:'School Principal',category:'Education',wage:55,education:'Graduate Degree + Experience',educationLevel:6,track:'Education',tier:6},
+  {name:'Corporate Attorney',category:'Legal',wage:96,education:'Law Degree',educationLevel:8,track:'Legal',tier:7},
+  {name:'Management Consultant',category:'Consulting',wage:70,education:'Bachelor Degree',educationLevel:4,track:'Consulting',tier:5},
+  {name:'Strategy Consultant',category:'Consulting',wage:82,education:'Bachelor Degree',educationLevel:4,track:'Consulting',tier:6},
+  {name:'Chief Financial Officer (CFO)',category:'Executive',wage:190,education:'Bachelor + MBA/Experience',educationLevel:5,track:'C-Suite',tier:10,executive:true},
+  {name:'Chief Executive Officer (CEO)',category:'Executive',wage:225,education:'Bachelor + Executive Experience',educationLevel:4,track:'C-Suite',tier:11,executive:true},
+  {name:'Chief Operating Officer (COO)',category:'Executive',wage:200,education:'Bachelor + Executive Experience',educationLevel:4,track:'C-Suite',tier:11,executive:true},
+  {name:'Chief Technology Officer (CTO)',category:'Executive',wage:205,education:'Bachelor + Technical Leadership',educationLevel:4,track:'C-Suite',tier:11,executive:true},
+  {name:'Chief Marketing Officer (CMO)',category:'Executive',wage:185,education:'Bachelor + Executive Experience',educationLevel:4,track:'C-Suite',tier:11,executive:true},
+  {name:'Entrepreneur',category:'Business',wage:0,education:'No degree required',educationLevel:0,track:'Entrepreneurship',tier:0}
+];
+
+const jobIndustries=['Retail','Hospitality','Healthcare','Technology','Finance','Construction','Transportation','Logistics','Agriculture','Education','Media','Entertainment','Energy','Government','Legal','Insurance','Real Estate','Sports','Science','Manufacturing','Aviation','Automotive','Telecommunications','Security','Food Production','Beauty','Travel','Recreation','Environmental','Maritime','Pharmaceuticals','Robotics','Aerospace','Publishing','Nonprofit','Ecommerce','Fashion','Music','Film','Gaming','Cybersecurity','Biotech','Mining','Utilities','Architecture','Consulting','Customer Service','Professional Services','Research','Consumer Goods','Warehousing','Operations','Cloud Services','AI','Semiconductors','Renewables','Water','Waste Management','Financial Services','Medical Devices','Home Services','Pet Services','Senior Services','Child Services','Events','Tourism','Sports Technology','Esports','Internet','Telehealth','EdTech','FinTech','InsurTech','PropTech','AdTech','Creator Economy','Streaming','Mobility','Battery Technology','Space Commerce','Drone Services','3D Printing','Food Tech','Health Tech','Travel Tech','Legal Tech','GovTech','MarTech','CleanTech','Industrial Services','Quality Assurance','Compliance','Risk Management','Procurement','Supply Chain'];
+const jobRoles=['Assistant','Associate','Clerk','Coordinator','Specialist','Technician','Operator','Representative','Advisor','Agent','Analyst','Consultant','Designer','Developer','Engineer','Inspector','Planner','Researcher','Processor','Auditor','Installer','Mechanic','Builder','Tester','Scientist','Broker','Dispatcher','Trainer','Administrator','Supervisor','Team Lead','Account Executive','Account Manager','Customer Success Manager','Field Technician','Sales Executive','Operations Lead','Quality Specialist','Compliance Officer','Safety Officer','Product Specialist','Service Technician','Project Lead','Program Manager','Business Analyst','Operations Manager','Production Manager','Facilities Manager','Procurement Specialist','Supply Chain Analyst','Risk Analyst','Revenue Analyst','Pricing Analyst','Implementation Specialist','Solutions Architect','Technical Program Manager','Client Partner','Portfolio Analyst','Underwriting Analyst','Claims Specialist','Clinical Specialist','Research Associate','Lab Specialist','Manufacturing Engineer','Process Engineer','Quality Engineer','Environmental Specialist','Fleet Coordinator','Route Planner','Inventory Planner','Merchandising Specialist','Brand Specialist','Community Manager','Content Strategist','Digital Producer','Studio Manager','Event Coordinator','Hospitality Manager','Property Analyst','Leasing Consultant','Asset Manager','Construction Manager','Estimator','Safety Manager','Site Supervisor','Maintenance Supervisor','Training Manager','Recruiting Coordinator','Talent Partner','Executive Assistant','Chief of Staff','Regional Manager','Division Manager','General Manager','Vice President','Senior Vice President','Managing Director','Executive Director','President','Chief Officer'];
+const jobLevels=['I','II','III','Senior','Lead','Principal','Supervisor','Manager','Senior Manager','Director','Senior Director','Vice President','Senior Vice President','Managing Director','Executive Vice President','President','Chief Officer','C-Suite'];
+
+const jobCatalogCategories=[...new Set([...canonicalJobs.map(j=>j.category),...jobIndustries])];
+const PROCEDURAL_JOB_COUNT=jobIndustries.length*jobRoles.length*jobLevels.length*8;
+
+function generatedJob(index){
+  const total=jobIndustries.length*jobRoles.length*jobLevels.length;
+  const base=((index%total)+total)%total;
+  const level=base%jobLevels.length;
+  const roleIndex=Math.floor(base/jobLevels.length)%jobRoles.length;
+  const industryIndex=Math.floor(base/(jobLevels.length*jobRoles.length))%jobIndustries.length;
+  const industry=jobIndustries[industryIndex];
+  const role=jobRoles[roleIndex];
+  const levelName=jobLevels[level];
+  const seniority=Math.min(level,16);
+  const edu=Math.min(6,Math.floor(seniority/3)+(industry==='Healthcare'||industry==='Engineering'||industry==='Pharmaceuticals'?1:0));
+  const degree=edu>=2;
+  const experienceYears=seniority===0?0:Math.min(30,seniority*2+2);
+  const baseWage=16+(industry.length*3%18)+(role.length*2%13);
+  const wage=Math.round((baseWage*Math.pow(1.065,seniority))*10)/10;
+  const track=industry==='Finance'?'Corporate Finance':industry==='Healthcare'?'Healthcare':industry==='Technology'?'Technology':industry==='Legal'?'Legal':industry==='Engineering'?'Engineering':industry;
+  const executive=seniority>=15 || /chief|president|vice president|executive/i.test(levelName);
+  return {
+    id:`g-${industryIndex}-${roleIndex}-${level}`,
+    name:`${levelName} ${role} — ${industry}`,
+    category:industry,wage,educationLevel:edu,
+    education:degree?'Degree / Experience':'No degree / Training',
+    track,tier:seniority,experienceYears,executive
+  };
+}
+
+function findJobById(id){
+  const ci=canonicalJobs.findIndex(j=>`c-${ciSafe(j.name)}-${canonicalJobs.indexOf(j)}`===id);
+  if(ci>=0)return {...canonicalJobs[ci],id,canonical:true};
+  if(String(id).startsWith('g-')){
+    const parts=id.slice(2).split('-').map(Number);
+    if(parts.length===3&&parts.every(Number.isInteger)){
+      const [i,r,l]=parts;
+      return generatedJob((i*jobRoles.length*jobLevels.length)+(r*jobLevels.length)+l);
+    }
+  }
+  return null;
+}
+function ciSafe(s){return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,35)}
+function canonicalJobId(j,i){return `c-${ciSafe(j.name)}-${i}`}
+canonicalJobs.forEach((j,i)=>j.id=canonicalJobId(j,i));
+
+/* ---------------------------- EDUCATION DATA ---------------------------- */
+const majors=[
+  'Biology','Biochemistry','Chemistry','Neuroscience','Biomedical Science','Computer Science','Software Engineering','Information Technology','Cybersecurity','Data Science','Artificial Intelligence','Mathematics','Statistics','Physics','Astronomy','Mechanical Engineering','Electrical Engineering','Civil Engineering','Chemical Engineering','Aerospace Engineering','Environmental Engineering','Architecture','Finance','Accounting','Economics','Business Administration','Marketing','Management','Entrepreneurship','Supply Chain Management','Hospitality Management','Real Estate','Psychology','Sociology','Political Science','History','English','Communications','Journalism','Graphic Design','Film','Music','Education','Elementary Education','Secondary Education','Nursing','Public Health','Kinesiology','Nutrition','Social Work','Criminal Justice','Legal Studies','Philosophy','Foreign Languages','International Business','Aviation Management','Agricultural Science','Animal Science','Food Science','Pharmaceutical Sciences','Public Administration','Urban Planning','Robotics','Mechatronics','Game Design','Digital Media','Advertising','Human Resources','Operations Management','Construction Management','Sports Management','Marine Science','Geology','Meteorology','Microbiology','Genetics','Molecular Biology','Ecology','Bioinformatics','Health Informatics','Medical Laboratory Science','Dental Hygiene','Radiologic Science','Emergency Management','Fire Science','Hospitality & Tourism','Fashion Merchandising','Interior Design','Industrial Design','Product Design','UX Design','Film Production','Broadcasting','Public Relations','Political Economy','International Relations','Geographic Information Systems','Renewable Energy Engineering','Materials Science','Nanotechnology'
+];
+const minors=['Business','Finance','Accounting','Marketing','Management','Entrepreneurship','Computer Science','Data Science','AI','Cybersecurity','Mathematics','Statistics','Biology','Chemistry','Neuroscience','Psychology','Physics','Engineering','Environmental Science','Public Health','Nutrition','Communications','Journalism','Writing','Graphic Design','Music','Film','Economics','Real Estate','Supply Chain','Leadership','Languages','Arabic','Spanish','French','Chinese','Japanese','Political Science','History','Education','Sports Management','Hospitality','Biotechnology','Bioinformatics','Health Informatics','Game Design','UX Design','Astronomy','Sustainability','Robotics','Aviation'];
+const schools=[
+  {name:'Riverside Community College',type:'Community College',city:'Little Rock',state:'AR',tuition:4200,selectivity:0.8,years:2},
+  {name:'Northstar Community College',type:'Community College',city:'Bentonville',state:'AR',tuition:4800,selectivity:0.78,years:2},
+  {name:'Arkansas State University',type:'Public University',city:'Jonesboro',state:'AR',tuition:10500,selectivity:0.65,years:4},
+  {name:'University of Arkansas',type:'Public University',city:'Fayetteville',state:'AR',tuition:12500,selectivity:0.62,years:4},
+  {name:'Midwest State University',type:'Public University',city:'St. Louis',state:'MO',tuition:13800,selectivity:0.55,years:4},
+  {name:'Great Lakes University',type:'Public University',city:'Chicago',state:'IL',tuition:16500,selectivity:0.48,years:4},
+  {name:'Metro City University',type:'Public University',city:'Dallas',state:'TX',tuition:16000,selectivity:0.5,years:4},
+  {name:'Pacific State University',type:'Public University',city:'Seattle',state:'WA',tuition:17800,selectivity:0.46,years:4},
+  {name:'Atlantic State University',type:'Public University',city:'Boston',state:'MA',tuition:19000,selectivity:0.42,years:4},
+  {name:'Lone Star Technical University',type:'Technical Institute',city:'Austin',state:'TX',tuition:9500,selectivity:0.63,years:4},
+  {name:'Westbridge Institute',type:'Private University',city:'Los Angeles',state:'CA',tuition:31500,selectivity:0.35,years:4},
+  {name:'Hudson Private University',type:'Private University',city:'New York',state:'NY',tuition:36000,selectivity:0.3,years:4},
+  {name:'Capital University',type:'Private University',city:'Washington',state:'DC',tuition:33500,selectivity:0.33,years:4},
+  {name:'Summit Polytechnic',type:'Technical Institute',city:'Denver',state:'CO',tuition:12000,selectivity:0.6,years:4},
+  {name:'Pacific Research Institute',type:'Elite University',city:'San Francisco',state:'CA',tuition:58000,selectivity:0.11,years:4},
+  {name:'Harbor Elite University',type:'Elite University',city:'Boston',state:'MA',tuition:62000,selectivity:0.08,years:4},
+  {name:'National Business University',type:'Private University',city:'New York',state:'NY',tuition:42000,selectivity:0.25,years:4},
+  {name:'Global Technology University',type:'Elite University',city:'San Jose',state:'CA',tuition:51000,selectivity:0.18,years:4},
+  {name:'Gulf Coast Medical College',type:'Private University',city:'Houston',state:'TX',tuition:44000,selectivity:0.3,years:4},
+  {name:'International Aviation Institute',type:'Technical Institute',city:'Miami',state:'FL',tuition:17500,selectivity:0.6,years:3},
+  {name:'London International College',type:'Private University',city:'London',state:'UK',tuition:30000,selectivity:0.4,years:4},
+  {name:'Dubai International University',type:'Private University',city:'Dubai',state:'UAE',tuition:28000,selectivity:0.45,years:4},
+  {name:'Singapore Global University',type:'Public University',city:'Singapore',tuition:22000,selectivity:0.32,years:4},
+  {name:'Tokyo Metropolitan University',type:'Public University',city:'Tokyo',tuition:12500,selectivity:0.38,years:4},
+  {name:'Zurich Business Institute',type:'Private University',city:'Zurich',state:'Switzerland',tuition:26000,selectivity:0.28,years:3},
+  {name:'Sydney Pacific University',type:'Public University',city:'Sydney',state:'Australia',tuition:24000,selectivity:0.5,years:4}
+];
+
+/* --------------------------- BUSINESS DATA ----------------------------- */
+const businessCategories=['Retail','Restaurants','Food','Waste Management','Services','Transportation','Logistics','Automotive','Healthcare','Finance','Real Estate','Construction','Technology','Education','Creative','Legal','Security','Travel','Hospitality','Agriculture','Manufacturing','Energy','Environmental','Maritime','Aviation','Entertainment','Sports','Pet Services','Home Services','Professional Services'];
+const canonicalBusinesses=[
+  ['Lawn Care Company','Services',8000,85,48,'Micro'],
+  ['Cleaning Company','Services',10000,95,52,'Micro'],
+  ['Dog Walking Service','Pet Services',5000,55,28,'Micro'],
+  ['Online Store','Retail',15000,75,32,'Micro'],
+  ['Food Truck','Restaurants',25000,120,62,'Local'],
+  ['Dumpster Rental Business','Waste Management',45000,180,86,'Local'],
+  ['Neighborhood Diner','Restaurants',55000,210,115,'Local'],
+  ['Coffee Shop','Restaurants',65000,180,90,'Local'],
+  ['Bakery','Food',50000,145,74,'Local'],
+  ['Laundromat','Services',110000,315,185,'Local'],
+  ['Car Wash','Automotive',140000,390,215,'Local'],
+  ['Pizza Shop','Restaurants',125000,350,190,'Local'],
+  ['Convenience Store','Retail',180000,520,315,'Local'],
+  ['Auto Repair Shop','Automotive',240000,620,350,'Local'],
+  ['Moving Company','Transportation',275000,700,400,'Regional'],
+  ['Trucking Company','Logistics',450000,1150,740,'Regional'],
+  ['Construction Company','Construction',500000,1350,820,'Regional'],
+  ['Real Estate Agency','Real Estate',350000,1050,520,'Regional'],
+  ['Marketing Agency','Professional Services',180000,550,250,'Regional'],
+  ['Security Company','Security',300000,760,410,'Regional'],
+  ['Daycare Center','Education',425000,900,590,'Regional'],
+  ['Hotel','Hospitality',4500000,7600,5300,'National'],
+  ['Supermarket','Retail',3800000,9800,7200,'National'],
+  ['Urgent Care Network','Healthcare',12000000,24500,15700,'National'],
+  ['Dental Practice Group','Healthcare',4500000,11200,6300,'National'],
+  ['SaaS Company','Technology',2000000,8400,3100,'National'],
+  ['Cybersecurity Firm','Technology',3500000,9700,3600,'National'],
+  ['Game Studio','Technology',1500000,5200,2300,'National'],
+  ['Private School','Education',8500000,15500,10200,'National'],
+  ['Law Firm','Legal',3000000,7200,3300,'National'],
+  ['Insurance Agency','Finance',1000000,3300,1650,'Regional'],
+  ['Credit Union','Finance',9000000,14000,8700,'National'],
+  ['Bank','Finance',60000000,95000,62000,'Global'],
+  ['Investment Firm','Finance',45000000,68000,33500,'Global'],
+  ['Airline','Aviation',750000000,1200000,1030000,'Global'],
+  ['Shipping Company','Maritime',300000000,450000,270000,'Global'],
+  ['Pharmaceutical Company','Healthcare',150000000,360000,188000,'Global'],
+  ['Semiconductor Manufacturer','Manufacturing',400000000,610000,405000,'Global'],
+  ['Cloud Infrastructure Company','Technology',250000000,520000,310000,'Global'],
+  ['Energy Company','Energy',900000000,1600000,1180000,'Global'],
+  ['Global Retail Conglomerate','Retail',1200000000,2400000,1920000,'Global'],
+  ['International Hotel Group','Hospitality',850000000,1800000,1260000,'Global'],
+  ['Space Commerce Company','Aerospace',2500000000,4200000,3120000,'Global']
+].map((x,i)=>({id:`b-${i}`,name:x[0],category:x[1],startup:x[2],revenue:x[3],cost:x[4],tier:x[5],canonical:true}));
+
+const bizPrefixes=['Neighborhood','Downtown','Metro','Regional','National','Global','Prime','Summit','Crown','Apex','United','Advanced','Modern','Premier','Heritage','Evergreen','Pioneer','Velocity','Bluechip','Frontier','Capital','Sterling','Atlas','Vertex','Nova','Quantum','Silverline','Grand','Urban','Continental','International','Worldwide','Universal','NextGen','Rapid','Smart','Elite','Core','Peak','Infinity','Horizon','Vanguard','Liberty','Golden','Pacific','Atlantic','Central','Northern','Southern','Eastern','Western','Digital','Green','Blue','Redwood','Oak','Skyline','Harbor','Lakeside','Mountain','Royal','First'];
+const bizModels=['LLC','Holdings','Group','Partners','Services','Solutions','Network','Company','Ventures','Brands','Collective','Enterprises','Operations','Capital','Systems','Labs','Industries','Works','Studio','Marketplace','Exchange','Alliance','Corporation','International','Logistics','Properties','Management','Technologies','Platforms','Supply'];
+const bizConcepts=['Store','Marketplace','Agency','Franchise','Service','Factory','Plant','Warehouse','Network','Platform','Center','Clinic','Practice','Firm','Fund','Banking Service','Rental Service','Restaurant','Hotel','Fleet','Farm','Lab','Distribution Hub','Subscription Service','Software Platform','Consultancy','Brokerage','Management Company','Trading Company','Production House','Repair Center','Training Center','Recycling Facility','Waste Service','Delivery Network','Technology Platform','Financial Service','Property Group','Construction Group','Energy Project','Media Network','Sports Organization','Event Company','Tour Company','Pet Service','Home Service','Education Provider','Health Service','Manufacturing Group','Research Group'];
+const PROCEDURAL_BUSINESS_COUNT=businessCategories.length*bizPrefixes.length*bizModels.length*bizConcepts.length;
+
+function generatedBusiness(index){
+  const total=bizPrefixes.length*bizModels.length*bizConcepts.length*businessCategories.length;
+  let x=((index%total)+total)%total;
+  const catIndex=x%businessCategories.length;x=Math.floor(x/businessCategories.length);
+  const conceptIndex=x%bizConcepts.length;x=Math.floor(x/bizConcepts.length);
+  const modelIndex=x%bizModels.length;x=Math.floor(x/bizModels.length);
+  const prefixIndex=x%bizPrefixes.length;
+  const cat=businessCategories[catIndex],concept=bizConcepts[conceptIndex],model=bizModels[modelIndex],prefix=bizPrefixes[prefixIndex];
+  const tierIndex=Math.floor((catIndex+conceptIndex+modelIndex+prefixIndex)/17)%5;
+  const tiers=['Micro','Local','Regional','National','Global'];
+  const multipliers=[1,7,40,240,1500];
+  const mult=multipliers[tierIndex];
+  const seed=(prefix.length*13+concept.length*7+model.length*5+cat.length*3)%100;
+  const startup=Math.round((5500+seed*420)*mult/500)*500;
+  const revenue=Math.max(25,Math.round((90+concept.length*7+cat.length*4)*(0.85+seed/300)*mult/2));
+  const cost=Math.round(revenue*(0.48+(seed%18)/100));
+  return {id:`bg-${prefixIndex}-${modelIndex}-${conceptIndex}-${catIndex}`,name:`${prefix} ${concept} ${model}`,category:cat,startup,revenue,cost,tier:tiers[tierIndex],canonical:false};
+}
+function getBusinessById(id){const c=canonicalBusinesses.find(x=>x.id===id);if(c)return c;if(String(id).startsWith('bg-')){const p=id.slice(3).split('-').map(Number);if(p.length===4&&p.every(Number.isInteger)){const [a,b,c,d]=p;let idx=((((a*bizModels.length)+b)*bizConcepts.length+c)*businessCategories.length)+d;return generatedBusiness(idx)}}return null}
+
+/* ----------------------------- LOCATIONS -------------------------------- */
+const locations=[
+  {name:'Bentonville, Arkansas',country:'USA',currency:'USD',personalTax:.14,businessTax:.20,revenueMod:0,cost:1.00,rent:42,moveCost:1200,description:'Lower-cost U.S. city with strong retail and logistics opportunities.'},
+  {name:'New York City, New York',country:'USA',currency:'USD',personalTax:.22,businessTax:.235,revenueMod:.15,cost:1.85,rent:82,moveCost:2800,description:'Huge labor market, high demand, high living costs.'},
+  {name:'Dallas, Texas',country:'USA',currency:'USD',personalTax:.14,businessTax:.21,revenueMod:.08,cost:1.08,rent:48,moveCost:1700,description:'Fast-growing business market with moderate costs.'},
+  {name:'Miami, Florida',country:'USA',currency:'USD',personalTax:.14,businessTax:.21,revenueMod:.10,cost:1.16,rent:58,moveCost:1900,description:'Tourism-heavy market with strong services and hospitality demand.'},
+  {name:'Seattle, Washington',country:'USA',currency:'USD',personalTax:.14,businessTax:.21,revenueMod:.12,cost:1.48,rent:68,moveCost:2400,description:'Technology-heavy economy with higher housing costs.'},
+  {name:'Los Angeles, California',country:'USA',currency:'USD',personalTax:.22,businessTax:.26,revenueMod:.16,cost:1.74,rent:76,moveCost:3000,description:'Large entertainment, technology and services economy.'},
+  {name:'Chicago, Illinois',country:'USA',currency:'USD',personalTax:.17,businessTax:.23,revenueMod:.08,cost:1.32,rent:58,moveCost:2100,description:'Large diversified urban economy with finance, manufacturing and services.'},
+  {name:'London, England',country:'UK',currency:'GBP',personalTax:.20,businessTax:.25,revenueMod:.16,cost:1.72,rent:78,moveCost:5200,description:'Major global finance and professional-services center.'},
+  {name:'Dubai, UAE',country:'UAE',currency:'AED',personalTax:0,businessTax:.09,revenueMod:.20,cost:1.55,rent:72,moveCost:6500,description:'No personal income tax in this game model; business profit faces a simulated 9% tax and business revenue gets a +20% gameplay demand modifier.'},
+  {name:'Singapore',country:'Singapore',currency:'SGD',personalTax:.15,businessTax:.17,revenueMod:.18,cost:1.62,rent:76,moveCost:6200,description:'Highly connected finance and trade hub with strong business demand.'},
+  {name:'Tokyo, Japan',country:'Japan',currency:'JPY',personalTax:.20,businessTax:.23,revenueMod:.10,cost:1.42,rent:65,moveCost:5900,description:'Huge consumer market with high technical and manufacturing demand.'},
+  {name:'Zurich, Switzerland',country:'Switzerland',currency:'CHF',personalTax:.12,businessTax:.15,revenueMod:.14,cost:1.88,rent:90,moveCost:6800,description:'High wages, high living costs and strong finance demand.'},
+  {name:'Toronto, Canada',country:'Canada',currency:'CAD',personalTax:.18,businessTax:.25,revenueMod:.12,cost:1.45,rent:67,moveCost:4300,description:'Large North American business and technology market.'},
+  {name:'Sydney, Australia',country:'Australia',currency:'AUD',personalTax:.19,businessTax:.25,revenueMod:.12,cost:1.58,rent:74,moveCost:5600,description:'Strong services, tourism, finance and technology economy.'}
+];
+
+/* ----------------------------- STATE ----------------------------------- */
+function freshState(){
+  return {
+    profile:{name:'Player',email:'',phone:'',city:'',summary:''},
+    cash:100,checking:0,savings:0,retirement:0,roth:0,
+    age:18,day:1,hour:8,totalHours:0,
+    job:null,jobLevel:0,jobExperience:0,jobPerformance:50,lastWorkHarder:-999999,overtime:false,
+    workHoursToday:0,otHoursToday:0,weekWorkHours:0,weekNumber:1,
+    education:{level:0,major:'',minor:'',school:'',type:'',semester:0,semesterHours:0,totalHours:0,enrolled:false,tuitionDue:0,gpa:3.0},
+    businesses:[],loans:[],
+    skills:{leadership:5,sales:5,technical:5,finance:5,medical:0,operations:5,creativity:5,communication:8,transportation:5},
+    location:'Bentonville, Arkansas',lastMoveDay:-999999,
+    housing:{type:'Renting',costPerDay:42,homeValue:0,mortgage:0},
+    creditScore:650,consecutiveOnTime:0,
+    stats:{wages:0,businessProfit:0,taxes:0,interest:0,hoursWorked:0,overtimeHours:0,promotions:0,businessesOpened:0,moves:0,days:0,collegeHours:0,workHarder:0},
+    achievements:[],events:true,log:[]
+  };
+}
+let state=freshState();
+
+function loc(){return locations.find(l=>l.name===state.location)||locations[0]}
+function jobObject(){if(!state.job)return null;return findJobById(state.job.id)||state.job}
+function liquid(){return state.cash+state.checking+state.savings}
+function assets(){return state.cash+state.checking+state.savings+state.retirement+state.roth+state.businesses.reduce((a,b)=>a+b.value,0)+(state.housing.homeValue||0)}
+function debt(){return state.loans.reduce((a,l)=>a+l.balance,0)+(state.housing.mortgage||0)}
+function netWorth(){return assets()-debt()}
+function dailyExpenses(){return state.housing.costPerDay+20*loc().cost+8*loc().cost+8*loc().cost+dailyBusinessFixedCosts()}
+function dailyBusinessFixedCosts(){return state.businesses.reduce((a,b)=>a+b.level*(b.fixedCost||0)/24,0)}
+function formatTime(h){const hh=((h%24)+24)%24;const s=hh>=12?'PM':'AM';return `${(hh%12)||12}:00 ${s}`}
+function yearsExperience(){return state.jobExperience/2080}
+function currentEducationLevel(){return state.education.level}
+function canAfford(amount){return liquid()>=amount}
+function payFromLiquid(amount){let remaining=amount;if(state.cash>=remaining){state.cash-=remaining;return true}remaining-=state.cash;state.cash=0;if(state.checking>=remaining){state.checking-=remaining;return true}remaining-=state.checking;state.checking=0;if(state.savings>=remaining){state.savings-=remaining;return true}state.savings=0;return false}
+function receive(amount){state.cash+=amount}
+
+/* ----------------------------- UI HELPERS ------------------------------- */
+function notify(msg){const wrap=document.getElementById('toast');const d=document.createElement('div');d.className='msg';d.textContent=msg;wrap.appendChild(d);setTimeout(()=>d.remove(),3600)}
+function log(msg){state.log.unshift({day:state.day,hour:state.hour,msg:String(msg)});state.log=state.log.slice(0,500)}
+function openModal(title,html){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=html;document.getElementById('modal').classList.remove('hidden')}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+function tab(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.tab-page').forEach(p=>p.classList.toggle('hidden',p.id!==`tab-${id}`));renderAll()}
+
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+/* ----------------------------- TAX / PAY -------------------------------- */
+function progressiveFederal(annual){
+  const brackets=[[15000,.10],[45000,.12],[90000,.22],[180000,.24],[350000,.32],[Infinity,.37]];
+  let remaining=Math.max(0,annual),prev=0,tax=0;
+  for(const [limit,rate] of brackets){const taxable=Math.max(0,Math.min(remaining,limit-prev));tax+=taxable*rate;remaining-=taxable;prev=limit;if(remaining<=0)break}
+  return tax;
+}
+function wageTax(gross){
+  const projected=(state.stats.wages+gross)*Math.max(1,2080/Math.max(1,state.jobExperience+1));
+  const effectiveFederal=progressiveFederal(projected)/Math.max(1,projected);
+  const payroll=.0765;
+  const locTax=loc().personalTax;
+  const total=Math.min(.60,effectiveFederal+payroll+locTax);
+  return gross*total;
+}
+function businessTax(profit){return Math.max(0,profit)*loc().businessTax}
+function hourlyWage(){
+  const j=jobObject();if(!j)return 0;
+  let wage=j.wage;
+  const jobLevel=state.jobLevel;
+  if(jobLevel>0)wage*=Math.pow(1.045,jobLevel);
+  if(loc().country==='UAE')wage*=1.08;
+  if(loc().revenueMod)wage*=1+loc().revenueMod*.25;
+  return wage;
+}
+
+/* --------------------------- WORK SYSTEM -------------------------------- */
+function shiftForJob(j){
+  const category=j?.category||'';
+  if(/Healthcare|Security|Hospitality|Transportation|Aviation|Food/i.test(category))return {start:7,end:15,days:7};
+  if(/Retail|Restaurants|Logistics|Manufacturing/i.test(category))return {start:8,end:16,days:6};
+  return {start:8,end:16,days:5};
+}
+function isScheduledWorkHour(hour){
+  const j=jobObject();if(!j||!state.job)return false;if(j.name==='Entrepreneur')return false;
+  const sh=shiftForJob(j);if(!((state.day-1)%7<sh.days))return false;return hour>=sh.start&&hour<sh.end;
+}
+function isOvertimeHour(hour){
+  const j=jobObject();if(!j||!state.overtime)return false;if(state.otHoursToday>=4)return false;
+  const sh=shiftForJob(j);return ((state.workHoursToday>=8)||(hour>=sh.end)) && state.otHoursToday<4 && (((state.day-1)%7)<sh.days);
+}
+function toggleOvertime(){
+  const j=jobObject();if(!j){notify('You need a job first.');return}
+  if(state.workHoursToday<8){notify('You need to complete 8 regular work hours before overtime is available.');return}
+  if(state.otHoursToday>=4){notify('You already reached the daily 4-hour overtime limit.');return}
+  state.overtime=!state.overtime;log(`Overtime ${state.overtime?'enabled':'disabled'}.`);renderAll();saveGame(true)
+}
+function workHarder(){
+  const elapsed=state.totalHours-state.lastWorkHarder;
+  if(!state.job){notify('You need a job before you can work harder.');return}
+  if(elapsed<6){notify(`Work Harder is on cooldown for ${6-elapsed} more in-game hour${6-elapsed===1?'':'s'}.`);return}
+  if(!isScheduledWorkHour(state.hour)&&!isOvertimeHour(state.hour)){notify('Use Work Harder during a work hour.');return}
+  const boost=Math.max(4,rand(6,12)-(state.workHoursToday>10?2:0));
+  state.lastWorkHarder=state.totalHours;state.jobPerformance=clamp(state.jobPerformance+boost,0,100);state.stats.workHarder++;
+  state.skills.leadership=clamp(state.skills.leadership+(Math.random()<.7?1:0),0,100);state.skills.operations=clamp(state.skills.operations+1,0,100);
+  log(`You worked harder than expected. Performance +${boost}%.`);notify('Work Harder used. Your performance improved.');renderAll();saveGame(true)
+}
+
+function workRegularHour(){
+  const j=jobObject();if(!j||j.name==='Entrepreneur')return 0;
+  const regular=isScheduledWorkHour(state.hour);const ot=isOvertimeHour(state.hour);
+  if(!regular&&!ot)return 0;
+  if(regular)state.workHoursToday++;else{state.otHoursToday++;state.stats.overtimeHours++}
+  state.jobExperience++;
+  const base=hourlyWage();const gross=base*(ot?1.5:1);const tax=wageTax(gross);const net=Math.max(0,gross-tax);receive(net);
+  state.stats.wages+=gross;state.stats.taxes+=tax;state.weekWorkHours++;state.stats.hoursWorked++;
+  state.jobPerformance=clamp(state.jobPerformance+(ot?-0.65:0.18),0,100);
+  for(const k of ['communication','operations','leadership','sales'])if(Math.random()<.004)state.skills[k]=clamp((state.skills[k]||0)+1,0,100);
+  if(j.category==='Transportation')state.skills.transportation=clamp((state.skills.transportation||0)+(.001>Math.random()?1:0),0,100);
+  return gross;
+}
+
+function promotionRequirement(level){
+  const hours=[0,900,2400,4500,7000,10000,14500,19500,26000,33000,41000,50000];
+  const performance=[0,55,60,64,68,72,75,78,82,86,90,93];
+  const minYears=[0,.5,1.5,2.5,4,5.5,7,9,12,15,18,22];
+  const education=[0,0,0,1,2,3,3,4,4,5,5,5];
+  return {hours:hours[Math.min(level,hours.length-1)],performance:performance[Math.min(level,performance.length-1)],years:minYears[Math.min(level,minYears.length-1)],education:education[Math.min(level,education.length-1)]}
+}
+function currentPromotionTitle(){
+  const titles=['Entry Level','Associate','Senior Associate','Team Lead','Supervisor','Manager','Senior Manager','Director','Senior Director','Vice President','Senior Vice President','C-Suite'];return titles[Math.min(state.jobLevel,titles.length-1)]
+}
+function careerDisplayTitle(){
+  if(state.jobLevel<11)return currentPromotionTitle();
+  const track=jobObject()?.track||'';
+  if(track==='Corporate Finance'||track==='Banking')return 'Chief Financial Officer (CFO)';
+  if(track==='Technology')return 'Chief Technology Officer (CTO)';
+  if(track==='Marketing')return 'Chief Marketing Officer (CMO)';
+  return 'Chief Executive Officer (CEO)';
+}
+function promotionEligible(){
+  const req=promotionRequirement(state.jobLevel+1);return state.jobExperience>=req.hours&&state.jobPerformance>=req.performance&&yearsExperience()>=req.years&&state.education.level>=req.education
+}
+function promotionReview(){
+  const j=jobObject();if(!j||j.name==='Entrepreneur')return;
+  const next=state.jobLevel+1;if(next>=12)return;
+  const req=promotionRequirement(next);
+  if(state.jobExperience>=req.hours&&state.jobPerformance>=req.performance){
+    const educationOK=state.education.level>=req.education;const experienceOK=yearsExperience()>=req.years;
+    if(educationOK&&experienceOK){
+      const chance=clamp((state.jobPerformance-req.performance)*.02+.25,0,.95);
+      if(Math.random()<chance){state.jobLevel++;state.stats.promotions++;state.jobPerformance=clamp(state.jobPerformance-8,0,100);state.skills.leadership=clamp(state.skills.leadership+2,0,100);log(`Promotion review passed: ${careerDisplayTitle()} on the ${j.track} career track.`);notify(`Promotion earned: ${careerDisplayTitle()}!`)}
+    }
+  }
+}
+function quitJob(){if(!state.job)return;log(`You resigned from ${jobObject().name}.`);state.job=null;state.jobLevel=0;state.jobExperience=0;state.jobPerformance=50;state.overtime=false;renderAll();saveGame(true)}
+function takeJob(id){
+  const j=findJobById(id);if(!j)return;
+  if(state.job&&state.job.id===id){notify('You already have this job.');return}
+  if(j.name==='Entrepreneur'){
+    state.job={...j};state.jobLevel=0;state.jobExperience=0;state.jobPerformance=55;state.overtime=false;log('You chose entrepreneurship as your one active career.');renderAll();saveGame(true);return
+  }
+  if(state.education.level<j.educationLevel){notify(`Locked: ${j.education}. Your current education level is ${state.education.level}/${j.educationLevel}.`);return}
+  if(j.executive){notify('Executive jobs are intentionally extremely difficult. You must build the required career experience and reach the executive education level first.');return}
+  if(j.license){
+    const skill=(j.license==='CDL'?'transportation':j.license==='Driver License'?'operations':'sales');if(state.skills[skill]<(j.educationLevel?j.educationLevel*5:0)){notify(`You need the appropriate license/training profile for ${j.name}.`);return}
+  }
+  if(state.job){log(`You left ${jobObject().name} to accept ${j.name}.`)}else{log(`You accepted your first job: ${j.name}.`)}
+  state.job={...j};state.jobLevel=0;state.jobExperience=0;state.jobPerformance=50;state.overtime=false;renderAll();saveGame(true)
+}
+
+/* ----------------------------- TIME ------------------------------------ */
+function advanceHour(){
+  // First hour's activities use the current hour; then the clock advances.
+  const gross=workRegularHour();
+  operateBusinesses();
+  attendCollegeHour();
+  collectInterest();
+  processLoans(.00002);
+  state.totalHours++;
+  state.hour++;
+  if(state.hour>=24){state.hour=0;state.day++;state.stats.days++;state.workHoursToday=0;state.otHoursToday=0;state.overtime=false;if(state.day%7===1){state.weekWorkHours=0;state.weekNumber++}dailyTick()}
+  if(state.job&&state.hour===17&&state.workHoursToday>=8)promotionReview();
+  if(Math.random()<.018&&state.events)randomLifeEvent();
+  if(state.hour===0)state.jobPerformance=clamp(state.jobPerformance-(sleepH(state.hour)?0:0),0,100);
+  checkAchievements();renderAll();saveGame(true);
+  if(gross>0&&state.hour===17)notify(`Workday complete. Gross wages today include ${money(gross)} from the last hour.`)
+}
+function dailyTick(){
+  const expense=dailyExpenses();
+  if(!payFromLiquid(expense)){
+    const shortfall=Math.max(0,expense-liquid());
+    state.cash=0;state.checking=0;state.savings=0;
+    if(shortfall>0){state.loans.push({name:'Emergency Credit',balance:shortfall,apr:.24,payment:Math.max(25,shortfall*.12)});state.creditScore=clamp(state.creditScore-12,300,850);log(`Living expenses exceeded available liquid funds. Emergency credit of ${money(shortfall)} was added.`)}
+  }
+  // Daily performance recovery after sleep.
+  state.jobPerformance=clamp(state.jobPerformance+(state.workHoursToday<=8?1:-2),0,100);
+  if(state.day%365===0){state.age++;log(`You turned ${state.age}.`);if(state.age>=65)notify('You reached traditional retirement age. You may keep working, scale businesses, or retire from your job.')}
+}
+function operateBusinesses(){
+  for(const b of state.businesses){
+    const base=b.revenue*Math.pow(1.18,b.level-1);
+    const demand=(1+loc().revenueMod)*(0.93+Math.random()*.14);
+    let revenue=base*demand;
+    const payroll=b.employees*b.employeeWage;
+    const fixed=b.fixedCost*Math.pow(1.12,b.level-1);
+    const rawProfit=revenue-payroll-fixed;
+    const corpTax=rawProfit>0?businessTax(rawProfit)/24:0;
+    const profit=rawProfit-corpTax;
+    state.cash+=profit;state.stats.businessProfit+=profit;state.stats.taxes+=Math.max(0,corpTax);
+    b.hoursOpen=(b.hoursOpen||0)+1;b.recentProfit=profit;b.value=Math.max(b.startup*.55,profit*24*30);
+    b.reputation=clamp((b.reputation||50)+(profit>0?.015:-.03),0,100);
+  }
+}
+function attendCollegeHour(){
+  if(!state.education.enrolled)return;
+  const h=state.hour;const classHour=h>=9&&h<15;const weekday=isWeekday(state.day);
+  if(classHour&&weekday){
+    state.education.semesterHours++;state.education.totalHours++;state.stats.collegeHours++;state.education.gpa=clamp(state.education.gpa+(Math.random()<.05?(Math.random()<.55?.01:-.01):0),0,4);
+    if(state.education.semesterHours>=180)completeSemester();
+  }
+}
+function completeSemester(){
+  state.education.semesterHours=0;state.education.semester++;state.education.gpa=clamp(state.education.gpa+(Math.random()<.5?.03:-.02),0,4);
+  const tuition=state.education.tuitionPerSemester||state.education.tuitionDue;
+  if(!canAfford(tuition)){
+    state.loans.push({name:'Student Loan',balance:tuition,apr:.055,payment:Math.max(70,tuition*.015)});state.education.tuitionDue=0;log(`Semester ${state.education.semester} completed. Tuition was financed with a simulated student loan of ${money(tuition)}.`)
+  }else{payFromLiquid(tuition);state.education.tuitionDue=0;log(`Semester ${state.education.semester} completed. Tuition paid: ${money(tuition)}.`)}
+  if(state.education.semester>=state.education.targetSemesters){
+    state.education.level=Math.max(state.education.level,state.education.targetLevel);state.education.enrolled=false;
+    const label=state.education.targetLevel>=8?'professional / doctorate program':state.education.targetLevel>=6?'graduate program':'Bachelor Degree';
+    log(`Congratulations — you completed your ${label} in ${state.education.major}.`);notify(`${label} completed! Your resume updated automatically.`)
+  }
+}
+function startPostgraduate(program){
+  if(state.education.enrolled){notify('Finish or leave your current program first.');return}
+  if(state.education.level<4){notify('You need a Bachelor Degree before starting this program.');return}
+  state.education.enrolled=true;state.education.school=program.school;state.education.type=program.type;state.education.semester=0;state.education.semesterHours=0;state.education.totalHours=0;state.education.targetSemesters=program.years*2;state.education.targetLevel=program.level;state.education.tuitionPerSemester=program.tuition;state.education.tuitionDue=program.tuition;
+  log(`Started ${program.name}. It is designed to take ${program.years} simulated years.`);notify(`Enrolled in ${program.name}.`);renderAll();saveGame(true)
+}
+function collectInterest(){
+  const s=state.savings*(Math.pow(1.04,1/8760)-1);const r=state.retirement*(Math.pow(1.07,1/8760)-1);const ro=state.roth*(Math.pow(1.08,1/8760)-1);state.savings+=s;state.retirement+=r;state.roth+=ro;state.stats.interest+=s+r+ro
+}
+function processLoans(hourRate){for(const l of state.loans){l.balance+=Math.max(0,l.balance*l.apr/8760)}if(state.loans.length>0&&state.day%30===1){payLoanMinimums()}}
+function payLoanMinimums(){for(const l of [...state.loans]){const p=Math.min(l.payment,l.balance,liquid());if(p<=0)continue;payFromLiquid(p);l.balance-=p;state.creditScore=clamp(state.creditScore+1,300,850);state.consecutiveOnTime++;if(l.balance<=.01){state.loans.splice(state.loans.indexOf(l),1);state.creditScore=clamp(state.creditScore+12,300,850);log(`You fully repaid ${l.name}.`)}else log(`Automatic minimum payment of ${money(p)} made on ${l.name}.`)}}
+
+/* ----------------------------- COLLEGE --------------------------------- */
+function chooseSchool(schoolName){
+  const school=schools.find(s=>s.name===schoolName);if(!school)return;
+  if(state.education.enrolled){notify('You are already enrolled. Finish or leave your current program first.');return}
+  state.education.school=school.name;state.education.type=school.type;state.education.tuitionDue=school.tuition;openMajorPicker(school)
+}
+function openMajorPicker(school){
+  openModal(`Apply to ${school.name}`,`
+    <div class="section-note">School: ${escapeHtml(school.name)} • ${escapeHtml(school.type)} • ${escapeHtml(school.city)} • Simulated tuition ${money(school.tuition)} / semester • Selectivity ${(school.selectivity*100).toFixed(0)}%</div>
+    <div class="field"><label class="input-label">Major</label><select id="applyMajor">${majors.map(m=>`<option>${escapeHtml(m)}</option>`).join('')}</select></div>
+    <div class="field"><label class="input-label">Minor</label><select id="applyMinor"><option value="">No minor</option>${minors.map(m=>`<option>${escapeHtml(m)}</option>`).join('')}</select></div>
+    <div class="field"><label class="input-label">Application</label><div class="small muted">Your simulated admission profile is based on your education, skills, prior performance and a little uncertainty. Competitive schools are harder to enter.</div></div>
+    <button class="btn primary" onclick="applyToSchool(${JSON.stringify(school.name)})">Submit Application</button>
+  `)
+}
+function applyToSchool(name){
+  const school=schools.find(s=>s.name===name);if(!school)return;
+  const major=document.getElementById('applyMajor').value;const minor=document.getElementById('applyMinor').value;
+  const profile=clamp(.58+(state.education.gpa-3)*.18+state.skills.communication/300+state.stats.workHarder*.0005,0,.98);
+  const chance=clamp(school.selectivity+(1-school.selectivity)*profile,0,.99);
+  if(Math.random()>chance){closeModal();log(`Application to ${school.name} was not accepted this time.`);notify('Application not accepted. Try another school or strengthen your profile.');return}
+  state.education.enrolled=true;state.education.school=school.name;state.education.type=school.type;state.education.major=major;state.education.minor=minor;state.education.semester=0;state.education.semesterHours=0;state.education.totalHours=0;state.education.tuitionDue=school.tuition;state.education.gpa=clamp(state.education.gpa,0,4);
+  closeModal();log(`Accepted to ${school.name} for ${major}${minor?` with a minor in ${minor}`:''}.`);notify(`Accepted! You are now enrolled at ${school.name}.`);renderAll();saveGame(true)
+}
+function leaveCollege(){if(!state.education.enrolled)return;state.education.enrolled=false;log(`You left ${state.education.school} after ${state.education.semester} completed semester(s).`);renderAll();saveGame(true)}
+
+/* ---------------------------- BUSINESSES -------------------------------- */
+function businessTierInfo(tier){return {Micro:{level:1,reserve:1.25,cap:3},Local:{level:2,reserve:1.35,cap:20},Regional:{level:3,reserve:1.55,cap:80},National:{level:4,reserve:1.85,cap:300},Global:{level:5,reserve:2.15,cap:1000}}[tier]||{level:1,reserve:1.25,cap:3}}
+function openBusiness(id){
+  const base=getBusinessById(id);if(!base)return;
+  const info=businessTierInfo(base.tier);const capital=base.startup*info.reserve;
+  if(!canAfford(capital)){notify(`Not enough capital. ${base.tier} businesses require about ${money(capital)} in available liquid funds, including an operating reserve.`);return}
+  if(base.category==='Finance'&&state.stats.businessesOpened<2){notify('A major financial institution is intentionally an endgame business. Build real operating experience and capital first.');return}
+  if(base.tier==='Global'&&state.stats.businessesOpened<5){notify('Global businesses require an established portfolio. Own at least 5 businesses first.');return}
+  payFromLiquid(base.startup);const b={...base,level:1,employees:Math.max(0,Math.ceil(base.revenue/120)),employeeWage:Math.max(15,base.cost/Math.max(1,Math.ceil(base.revenue/120))*1.15),fixedCost:Math.max(3,base.cost*.08),value:base.startup,reputation:50,hoursOpen:0,recentProfit:0};
+  if(b.employees>businessTierInfo(b.tier).cap)b.employees=businessTierInfo(b.tier).cap;
+  state.businesses.push(b);state.stats.businessesOpened++;log(`Opened ${b.name} (${b.tier}) for ${money(base.startup)} and kept an operating reserve.`);notify(`${b.name} is now operating.`);renderAll();saveGame(true)
+}
+function upgradeBusiness(id){
+  const b=state.businesses.find(x=>x.id===id);if(!b)return;const tier=businessTierInfo(b.tier);if(b.level>=10){notify('This business is already at the maximum simulated level.');return}
+  const cost=Math.round(b.startup*Math.pow(1.65,b.level)*.42);
+  if(!canAfford(cost)){notify(`Upgrade costs ${money(cost)}. Higher tiers get dramatically more expensive.`);return}
+  payFromLiquid(cost);b.level++;b.revenue*=1.24;b.cost*=1.15;b.fixedCost*=1.12;b.value*=1.22;log(`${b.name} upgraded to level ${b.level}.`);renderAll();saveGame(true)
+}
+function hireEmployee(id){
+  const b=state.businesses.find(x=>x.id===id);if(!b)return;const cap=businessTierInfo(b.tier).cap;if(b.employees>=cap){notify(`This business is at its simulated employee capacity for its tier. Upgrade it first.`);return}
+  const wage=Math.max(15,b.employeeWage);const hiringFee=Math.max(250,wage*8);if(!canAfford(hiringFee)){notify(`Hiring cost is ${money(hiringFee)} upfront, plus ${money(wage)}/hr ongoing payroll.`);return}
+  payFromLiquid(hiringFee);b.employees++;b.revenue*=1.018;b.value+=hiringFee*.7;log(`Hired employee #${b.employees} at ${b.name}. Ongoing payroll increased by ${money(wage)}/hr.`);renderAll();saveGame(true)
+}
+function fireEmployee(id){const b=state.businesses.find(x=>x.id===id);if(!b||b.employees<=0)return;b.employees--;log(`Reduced staffing at ${b.name}.`);renderAll();saveGame(true)}
+function sellBusiness(id){
+  const idx=state.businesses.findIndex(x=>x.id===id);if(idx<0)return;const b=state.businesses[idx];const sale=Math.max(b.startup*.45,b.value*.58);openModal('Sell Business',`<p class="small muted" style="line-height:1.6">Selling ${escapeHtml(b.name)} today would return about <strong>${money(sale)}</strong>. This intentionally applies a discount for transaction costs, buyer risk and market conditions.</p><div class="action-row"><button class="btn red" onclick="confirmSellBusiness(${JSON.stringify(id)})">Sell for ${money(sale)}</button><button class="btn" onclick="closeModal()">Keep</button></div>`)
+}
+function confirmSellBusiness(id){const idx=state.businesses.findIndex(x=>x.id===id);if(idx<0){closeModal();return}const b=state.businesses[idx];const sale=Math.max(b.startup*.45,b.value*.58);receive(sale);state.businesses.splice(idx,1);closeModal();log(`Sold ${b.name} for ${money(sale)}.`);renderAll();saveGame(true)}
+
+/* ------------------------------ MONEY ---------------------------------- */
+function moveMoney(){
+  const amount=Number(document.getElementById('moneyAmount').value||0);const act=document.getElementById('moneyAction').value;if(amount<=0){notify('Enter an amount greater than $0.');return}
+  const take=(field,amt)=>{if(state[field]<amt)return false;state[field]-=amt;return true};
+  if(act==='cashToChecking'){if(take('cash',amount))state.checking+=amount;else notify('Not enough cash.')}
+  else if(act==='checkingToCash'){if(take('checking',amount))state.cash+=amount;else notify('Not enough checking funds.')}
+  else if(act==='checkingToSavings'){if(take('checking',amount))state.savings+=amount;else notify('Not enough checking funds.')}
+  else if(act==='savingsToChecking'){if(take('savings',amount))state.checking+=amount;else notify('Not enough savings funds.')}
+  else if(act==='checkingToRetirement'){if(take('checking',amount)){state.retirement+=amount;log(`Contributed ${money(amount)} to retirement.`)}else notify('Not enough checking funds.')}
+  else if(act==='retirementToChecking'){if(take('retirement',amount)){state.checking+=amount;log(`Withdrew ${money(amount)} from retirement. A 10% simulated early-withdrawal penalty may apply.`)}else notify('Not enough retirement funds.')}
+  renderAll();saveGame(true)
+}
+function contributeRoth(){const amt=Number(document.getElementById('rothAmount')?.value||0);if(amt<=0)return;if(!canAfford(amt)){notify('Not enough liquid funds.');return}payFromLiquid(amt);state.roth+=amt;log(`Contributed ${money(amt)} to your simulated Roth IRA.`);renderAll();saveGame(true)}
+function takeLoan(){
+  const amount=Number(document.getElementById('loanAmount')?.value||0);if(amount<1000){notify('Minimum loan request is $1,000.');return}
+  const max=Math.max(2500,netWorth()*2.5+state.stats.wages*.15+5000);if(amount>max){notify(`Your current credit profile supports about ${money(max)} at most.`);return}
+  const apr=clamp(.115-(state.creditScore-650)*.00012,.055,.24);state.checking+=amount;state.loans.push({name:'Personal / Business Credit',balance:amount,apr,payment:Math.max(60,amount*.022)});state.creditScore=clamp(state.creditScore-3,300,850);log(`Borrowed ${money(amount)} at a simulated ${(apr*100).toFixed(1)}% APR.`);renderAll();saveGame(true)
+}
+function manualLoanPayment(index){const l=state.loans[index];if(!l)return;const p=Math.min(l.payment,l.balance,liquid());if(p<=0){notify('You need liquid funds.');return}payFromLiquid(p);l.balance-=p;state.creditScore=clamp(state.creditScore+2,300,850);if(l.balance<=.01){state.loans.splice(index,1);state.creditScore=clamp(state.creditScore+10,300,850);log(`Paid off ${l.name}.`)}else log(`Made a ${money(p)} loan payment.`);renderAll();saveGame(true)}
+function buyHome(){
+  if(state.housing.type==='Own')return;const price=250000*loc().cost;if(!canAfford(price*.2)){notify(`A down payment of ${money(price*.2)} is required for a home in ${loc().name}.`);return}payFromLiquid(price*.2);state.housing.type='Own';state.housing.homeValue=price;state.housing.mortgage=price*.8;state.housing.costPerDay=Math.max(28,loc().rent*.65);log(`Bought a home in ${loc().name} for ${money(price)} with a 20% down payment.`);renderAll();saveGame(true)
+}
+
+/* ------------------------------ LIFE ----------------------------------- */
+function moveTo(name){
+  const destination=locations.find(l=>l.name===name);if(!destination)return;if(destination.name===state.location){notify('You already live there.');return}
+  const elapsed=state.day-state.lastMoveDay;if(elapsed<30){notify(`You moved recently. You can move again in ${30-elapsed} in-game day${30-elapsed===1?'':'s'}.`);return}
+  const cost=destination.moveCost*loc().cost;if(!canAfford(cost)){notify(`Moving requires about ${money(cost)} for transportation, deposits and setup.`);return}
+  const oldLocation=state.location;payFromLiquid(cost);state.location=destination.name;state.lastMoveDay=state.day;state.housing.costPerDay=destination.rent;state.stats.moves++;log(`Moved from ${oldLocation} to ${destination.name} for ${money(cost)}.`);notify(`Welcome to ${destination.name}.`);renderAll();saveGame(true)
+}
+function changeLifestyle(delta){state.housing.costPerDay=clamp(state.housing.costPerDay+delta,15,180);log(`Housing/lifestyle budget changed to ${money(state.housing.costPerDay)}/day.`);renderAll();saveGame(true)}
+function randomLifeEvent(){
+  const events=[
+    ['💳','A credit-card offer arrived.','No action needed, but maintaining good credit may help later.',0],
+    ['📈','A business competitor raised prices.','Your business revenue fluctuates for the next few hours.',0],
+    ['🎓','A professor praised your work.','College GPA improved slightly.',1],
+    ['💼','A recruiter noticed your profile.','Your next promotion review gets a small hidden boost.',1],
+    ['🚗','Unexpected transportation repair.','You spent $240 on repairs.',-240],
+    ['🏠','A landlord raised your rent.','Your daily housing cost increased.',-1],
+    ['⭐','A customer left an excellent review.','One random business gained reputation.',1]
+  ];
+  const e=pick(events);if(e[0]==='🚗'){if(canAfford(240))payFromLiquid(240);else state.loans.push({name:'Repair Credit',balance:240,apr:.22,payment:40});log(`${e[0]} ${e[1]} ${e[2]}`)}
+  else if(e[0]==='🎓'){state.education.gpa=clamp(state.education.gpa+.08,0,4);log(`${e[0]} ${e[1]} ${e[2]}`)}
+  else if(e[0]==='🏠'){state.housing.costPerDay+=8;log(`${e[0]} ${e[1]} ${e[2]}`)}
+  else if(e[0]==='⭐'&&state.businesses.length){pick(state.businesses).reputation=clamp(pick(state.businesses).reputation+4,0,100);log(`${e[0]} ${e[1]} ${e[2]}`)}
+  else log(`${e[0]} ${e[1]} ${e[2]}`)
+}
+function toggleEvents(){state.events=!state.events;renderAll();saveGame(true)}
+
+/* ----------------------------- PROFILE --------------------------------- */
+function openProfile(){
+  openModal('Player Profile',`
+    <div class="two-col">
+      <div class="field"><label class="input-label">Name</label><input id="profileName" value="${escapeHtml(state.profile.name)}"></div>
+      <div class="field"><label class="input-label">Email</label><input id="profileEmail" value="${escapeHtml(state.profile.email)}"></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label class="input-label">Phone</label><input id="profilePhone" value="${escapeHtml(state.profile.phone)}"></div>
+      <div class="field"><label class="input-label">Resume city</label><input id="profileCity" value="${escapeHtml(state.profile.city||state.location)}"></div>
+    </div>
+    <div class="field"><label class="input-label">Professional summary (optional)</label><textarea id="profileSummary" rows="4" placeholder="Automatically generated when blank.">${escapeHtml(state.profile.summary)}</textarea></div>
+    <button class="btn primary" onclick="saveProfile()">Save Profile</button>
+  `)
+}
+function saveProfile(){state.profile.name=document.getElementById('profileName').value.trim()||'Player';state.profile.email=document.getElementById('profileEmail').value.trim();state.profile.phone=document.getElementById('profilePhone').value.trim();state.profile.city=document.getElementById('profileCity').value.trim()||state.location;state.profile.summary=document.getElementById('profileSummary').value.trim();closeModal();log('Updated your profile. Your resume regenerated automatically.');renderAll();saveGame(true)}
+
+/* ------------------------------ RESUME --------------------------------- */
+function resumeSummary(){
+  if(state.profile.summary)return state.profile.summary;
+  const parts=[];
+  if(state.education.major)parts.push(`Aspiring ${state.education.major} professional`);
+  if(state.job)parts.push(`${careerDisplayTitle()} with ${yearsExperience().toFixed(1)} years of experience in ${jobObject().track}`);
+  if(state.businesses.length)parts.push(`business owner managing ${state.businesses.length} company${state.businesses.length===1?'':'ies'}`);
+  parts.push('motivated professional focused on building skills, experience and long-term results');
+  return parts.join('; ')+'.';
+}
+function resumeHtml(){
+  const j=jobObject();
+  const education=state.education.level>=4?`${state.education.major||'General Studies'} — Bachelor Degree${state.education.minor?` • Minor: ${state.education.minor}`:''} • ${state.education.school||'University'}`:state.education.enrolled?`${state.education.major||'Student'} — In progress • ${state.education.school}`:'High School Diploma';
+  const skillList=Object.entries(state.skills).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k])=>k.replace(/^[a-z]/,x=>x.toUpperCase())).join(' • ');
+  const businessText=state.businesses.length?state.businesses.slice(0,5).map(b=>`<li><strong>${escapeHtml(b.name)}</strong> — Owner • ${escapeHtml(b.category)} • Level ${b.level} • ${fmtInt(b.employees)} employees</li>`).join(''):'<li>No businesses yet — ready to build and operate one.</li>';
+  return `<div class="resume"><h1>${escapeHtml(state.profile.name)}</h1><div class="resume-contact">${escapeHtml(state.profile.email||'Email not set')} • ${escapeHtml(state.profile.phone||'Phone not set')} • ${escapeHtml(state.profile.city||state.location)}</div>
+    <h2>PROFESSIONAL SUMMARY</h2><p>${escapeHtml(resumeSummary())}</p>
+    <h2>EXPERIENCE</h2>${j?`<p><strong>${escapeHtml(currentPromotionTitle())} — ${escapeHtml(j.name)}</strong><br>${escapeHtml(j.category)} • ${escapeHtml(j.track)} • ${yearsExperience().toFixed(1)} years simulated experience • ${money(hourlyWage())}/hr</p>`:'<p>Career experience will appear here when you accept your first job.</p>'}
+    <h2>BUSINESS OWNERSHIP</h2><ul>${businessText}</ul>
+    <h2>EDUCATION</h2><p>${escapeHtml(education)}</p>${state.education.enrolled?`<p class="small"><strong>GPA:</strong> ${state.education.gpa.toFixed(2)} • Semester ${state.education.semester}</p>`:''}
+    <h2>SKILLS</h2><p>${escapeHtml(skillList||'General skills developing')}</p>
+    <h2>ACHIEVEMENTS</h2><p>${state.achievements.length?state.achievements.map(escapeHtml).join(' • '):'No achievements yet.'}</p>
+  </div>`
+}
+async function copyResume(){const temp=document.createElement('div');temp.innerHTML=resumeHtml();const text=temp.innerText;if(navigator.clipboard){try{await navigator.clipboard.writeText(text);notify('Resume copied to clipboard.')}catch(e){notify('Clipboard access was blocked by the browser; use Print / Save PDF instead.')}}}
+
+/* --------------------------- ACHIEVEMENTS ------------------------------- */
+function award(name){if(state.achievements.includes(name))return;state.achievements.push(name);log(`Achievement unlocked: ${name}`);notify(`🏆 Achievement unlocked: ${name}`)}
+function checkAchievements(){if(state.stats.hoursWorked>=40)award('First 40 Hours');if(state.education.level>=4)award('College Graduate');if(state.stats.businessesOpened>=1)award('First Business');if(state.stats.businessesOpened>=10)award('Business Mogul');if(netWorth()>=100000)award('$100K Net Worth');if(netWorth()>=1000000)award('$1M Net Worth');if(netWorth()>=10000000)award('$10M Net Worth');if(state.stats.promotions>=5)award('Climbing the Ladder');if(state.job&&/Chief/.test(careerDisplayTitle())&&yearsExperience()>=15)award('Executive Suite')}
+
+/* ----------------------------- RENDER ---------------------------------- */
+function renderStats(){
+  document.getElementById('cashStat').textContent=money(state.cash);document.getElementById('checkingStat').textContent=money(state.checking);document.getElementById('savingsStat').textContent=money(state.savings);document.getElementById('retireStat').textContent=money(state.retirement+state.roth);document.getElementById('netWorthStat').textContent=money(netWorth());document.getElementById('incomeStat').textContent=money(hourlyIncome());document.getElementById('creditStat').textContent=state.creditScore;
+  document.getElementById('clock').textContent=formatTime(state.hour);document.getElementById('dateLine').textContent=`Age ${state.age} • Day ${state.day} • Year ${Math.floor((state.age-18))+1} • ${currentWeekday()}`;
+  const j=jobObject();document.getElementById('jobStatusPill').textContent=j?(isScheduledWorkHour(state.hour)?`On shift • ${j.name}`:`Off shift • ${j.name}`):'No job';document.getElementById('overtimePill').textContent=state.overtime?'Overtime ON':'Overtime off';document.getElementById('collegePill').textContent=state.education.enrolled?`College • ${state.education.major}`:'Not enrolled';document.getElementById('hoursKpi').textContent=`${state.workHoursToday} / 8`;document.getElementById('workBar').style.width=`${clamp(state.workHoursToday/8*100,0,100)}%`;document.getElementById('performanceKpi').textContent=`${state.jobPerformance.toFixed(0)}%`;document.getElementById('performanceBar').style.width=`${state.jobPerformance}%`;document.getElementById('dailyExpenseKpi').textContent=money(dailyExpenses());document.getElementById('businessCountKpi').textContent=state.businesses.length
+}
+function hourlyIncome(){let n=hourlyWage();for(const b of state.businesses)n+=Math.max(0,b.revenue*Math.pow(1.18,b.level-1)-b.employees*b.employeeWage-b.fixedCost);return n}
+function renderCurrentJob(){const el=document.getElementById('currentJob');const j=jobObject();if(!j){el.innerHTML='<div class="empty">You are 18 with a high school diploma and no active job. A common early strategy is college + part-time work, but college is not mandatory for every career.</div>';return}const next=promotionRequirement(state.jobLevel+1);const progress=state.jobLevel>=11?100:clamp((state.jobExperience/Math.max(1,next.hours))*100,0,100);el.innerHTML=`<div class="row"><div class="row-left"><div class="row-title">${escapeHtml(currentPromotionTitle())} — ${escapeHtml(j.name)}</div><div class="row-sub">${escapeHtml(j.category)} • ${escapeHtml(j.track)} • ${escapeHtml(j.education)}</div></div><div class="item-meta"><strong class="green-text">${j.wage?money(hourlyWage()):'$0.00'}/hr</strong><span class="pill blue">Level ${state.jobLevel}</span></div></div><div style="margin-top:11px"><div class="small muted">Experience toward next promotion: ${fmtInt(state.jobExperience)} / ${fmtInt(next.hours)} hours</div><div class="progress" style="margin-top:6px"><div class="bar" style="width:${progress}%"></div></div><div class="small muted" style="margin-top:6px">Next review also requires ~${next.years} years experience, ${next.performance}% performance and education level ${next.education}.</div></div><div class="action-row"><button class="btn red" onclick="quitJob()">Resign</button>${state.workHoursToday>=8?`<button class="btn green" onclick="toggleOvertime()">Overtime: ${state.overtime?'ON':'OFF'}</button>`:''}</div>`}
+function renderCareerCard(){const el=document.getElementById('careerCard');const j=jobObject();if(!j){el.innerHTML='<div class="empty">No active job.</div>';return}el.innerHTML=`<div class="salary-big green-text">${j.wage?money(hourlyWage()):'$0.00'}<span class="small muted">/hour</span></div><div class="row"><span>Position</span><strong>${escapeHtml(careerDisplayTitle())}</strong></div><div class="row"><span>Career track</span><strong>${escapeHtml(j.track)}</strong></div><div class="row"><span>Total experience</span><strong>${yearsExperience().toFixed(1)} years</strong></div><div class="row"><span>Performance</span><strong>${state.jobPerformance.toFixed(0)}%</strong></div><div class="action-row">${state.workHoursToday>=8?`<button class="btn green" onclick="toggleOvertime()">Overtime ${state.overtime?'ON':'OFF'}</button>`:''}<button class="btn red" onclick="quitJob()">Quit</button></div>`}
+function renderWorkHarder(){const cd=Math.max(0,6-(state.totalHours-state.lastWorkHarder));const enabled=state.job&&(isScheduledWorkHour(state.hour)||isOvertimeHour(state.hour))&&cd===0;document.getElementById('workHarderCard').innerHTML=`<div class="row"><span>Cooldown</span><strong>${cd?`${cd} in-game hour${cd===1?'':'s'}`:'Ready'}</strong></div><div class="row"><span>Effect</span><strong>Performance +6–12%</strong></div><div class="row"><span>Experience</span><strong>Better promotion odds</strong></div><div class="small muted" style="margin-top:8px">Work Harder can only be used during a scheduled work hour or overtime and has a hard 6-hour cooldown. It does not directly print money.</div><div class="action-row"><button class="btn primary" ${enabled?'':'disabled'} onclick="workHarder()">💪 Work Harder</button></div>`}
+function renderPromotionTrack(){const el=document.getElementById('promotionTrack');if(!state.job){el.innerHTML='<div class="empty">Take a job to see its long-term ladder.</div>';return}const j=jobObject();const titles=['Entry Level','Associate','Senior Associate','Team Lead','Supervisor','Manager','Senior Manager','Director','Senior Director','Vice President','Senior Vice President','C-Suite'];el.innerHTML=titles.map((t,i)=>{const req=promotionRequirement(i);const done=i<state.jobLevel;const current=i===state.jobLevel;return `<div class="row"><div class="row-left"><div class="row-title">${done?'✅':current?'🟦':'🔒'} ${t}</div><div class="row-sub">${i===0?'Starting level':`Requires ${fmtInt(req.hours)} work hours • ${req.years} yrs • ${req.performance}% performance • education ${req.education}`}</div></div><span class="pill ${done?'green':current?'blue':''}">${done?'Completed':current?'Current':'Locked'}</span></div>`}).join('')+`<div class="warning" style="margin-top:10px">Executive titles are intentionally slow. CFO/CEO-style positions sit behind tens of thousands of hours, long experience gates and strong performance. You cannot simply spam a button to reach them.</div>`}
+function renderLongProgress(){const el=document.getElementById('longProgress');el.innerHTML=`<div class="stat-line"><span>Age</span><strong>${state.age}</strong></div><div class="stat-line"><span>Education</span><strong>${escapeHtml(state.education.major||'High School')}</strong></div><div class="stat-line"><span>Experience</span><strong>${yearsExperience().toFixed(1)} years</strong></div><div class="stat-line"><span>Businesses</span><strong>${state.businesses.length}</strong></div><div class="stat-line"><span>Net worth</span><strong class="gold-text">${money(netWorth())}</strong></div><div class="stat-line"><span>Location</span><strong>${escapeHtml(state.location)}</strong></div>`}
+function renderHomeBusinesses(){const el=document.getElementById('homeBusinesses');if(!state.businesses.length){el.innerHTML='<div class="empty">No businesses yet. Your first realistic milestone is building enough liquid capital to cover both startup cost and operating reserves.</div>';return}el.innerHTML=state.businesses.slice(0,7).map(b=>`<div class="row"><div class="row-left"><div class="row-title">${escapeHtml(b.name)}</div><div class="row-sub">${escapeHtml(b.tier)} • Level ${b.level} • ${fmtInt(b.employees)} employees</div></div><div class="item-meta"><strong class="green-text">${money(Math.max(0,b.recentProfit||0))}/hr</strong><span class="small muted">${money(b.value)} value</span></div></div>`).join('')+(state.businesses.length>7?`<div class="small muted" style="margin-top:8px">+ ${state.businesses.length-7} more businesses</div>`:'')}
+function renderLogs(){const html=state.log.length?state.log.map(x=>`<div class="log-item"><span class="log-time">Day ${x.day} • ${formatTime(x.hour)}</span>${escapeHtml(x.msg)}</div>`).join(''):'<div class="empty">No events yet.</div>';document.getElementById('homeLog').innerHTML=state.log.slice(0,12).length?state.log.slice(0,12).map(x=>`<div class="log-item"><span class="log-time">Day ${x.day} • ${formatTime(x.hour)}</span>${escapeHtml(x.msg)}</div>`).join(''):'<div class="empty">No events yet.</div>';document.getElementById('fullLog').innerHTML=html}
+function renderAchievements(){const el=document.getElementById('achievements');el.innerHTML=state.achievements.length?state.achievements.map(a=>`<div class="achievement"><span class="badge">🏆</span><div><strong>${escapeHtml(a)}</strong><div class="small muted">Unlocked during your career.</div></div></div>`).join(''):'<div class="empty">Your first achievement is waiting.</div>'}
+
+function jobEligible(j){return !j.executive&&state.education.level>=j.educationLevel}
+function renderJobs(){
+  const q=document.getElementById('jobSearch').value.trim().toLowerCase();const cat=document.getElementById('jobCategory').value;const sort=document.getElementById('jobSort').value;
+  let arr=canonicalJobs.filter(j=>(!q||`${j.name} ${j.category} ${j.education} ${j.track}`.toLowerCase().includes(q))&&(!cat||j.category===cat));
+  const target=120;
+  // Deterministically sample the procedural catalog instead of creating millions of DOM nodes.
+  const seen=new Set(arr.map(x=>x.id));
+  for(let n=0;arr.length<target&&n<2400;n++){
+    const x=generatedJob((n*7919)%Math.max(1,PROCEDURAL_JOB_COUNT));
+    if(seen.has(x.id))continue;if(q&&!`${x.name} ${x.category} ${x.education} ${x.track}`.toLowerCase().includes(q))continue;if(cat&&x.category!==cat)continue;seen.add(x.id);arr.push(x)
+  }
+  if(sort==='pay')arr.sort((a,b)=>b.wage-a.wage);if(sort==='low')arr.sort((a,b)=>a.wage-b.wage);if(sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name));if(sort==='education')arr.sort((a,b)=>a.educationLevel-b.educationLevel||a.wage-b.wage);if(sort==='executive')arr.sort((a,b)=>(b.tier-a.tier)||b.wage-a.wage);
+  document.getElementById('jobCount').textContent=`Showing ${Math.min(arr.length,120)} results • ${fmtInt(PROCEDURAL_JOB_COUNT)}+ procedural career combinations.`;
+  document.getElementById('jobCatalog').innerHTML=arr.slice(0,120).map(j=>`<div class="item"><div><div class="item-title">${escapeHtml(j.name)} ${j.id===state.job?.id?'<span class="pill blue">Current</span>':''}</div><div class="item-sub">${escapeHtml(j.category)} • ${escapeHtml(j.education)}${j.experienceYears?` • ${j.experienceYears} yrs prior experience`:''}${j.executive?' • Executive':''}</div></div><div class="item-meta"><strong class="green-text">${j.wage?money(j.wage)+'/hr':'Equity / ownership'}</strong>${j.id===state.job?.id?'<button class="btn" disabled>Current</button>':jobEligible(j)?`<button class="btn primary" onclick="takeJob(${JSON.stringify(j.id)})">Take job</button>`:`<button class="btn" disabled>Locked</button>`}</div></div>`).join('')||'<div class="empty">No jobs match that search.</div>'
+}
+function renderSchools(){
+  const q=document.getElementById('schoolSearch').value.trim().toLowerCase();const type=document.getElementById('schoolType').value;const arr=schools.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.city.toLowerCase().includes(q))&&(!type||s.type===type));document.getElementById('schoolCatalog').innerHTML=arr.map(s=>`<div class="item"><div><div class="item-title">${escapeHtml(s.name)}</div><div class="item-sub">${escapeHtml(s.type)} • ${escapeHtml(s.city)}${s.state?`, ${escapeHtml(s.state)}`:''} • ${money(s.tuition)}/semester • ${s.years} years typical</div></div><div class="item-meta"><strong>${(s.selectivity*100).toFixed(0)}% selectivity</strong><button class="btn primary" onclick="chooseSchool(${JSON.stringify(s.name)})">Apply</button></div></div>`).join('')||'<div class="empty">No colleges match that search.</div>'
+}
+function renderCollege(){
+  const c=document.getElementById('collegeStatus');
+  if(!state.education.enrolled){
+    c.innerHTML=`<div class="kpi"><strong>${state.education.level>=4?'Bachelor Degree earned':'Not enrolled'}</strong><div class="small muted" style="margin-top:4px">You start at age 18 with a high school diploma. Choose a school and major above. After a bachelor degree, professional programs unlock for careers such as medicine, law, pharmacy, dentistry and advanced research.</div></div>`;
+    document.getElementById('majorCatalog').innerHTML=majors.slice(0,55).map(m=>`<span class="pill" style="margin:3px">${escapeHtml(m)}</span>`).join('')+`<div class="small muted" style="margin-top:9px">${majors.length} majors available.</div>`;
+    document.getElementById('minorCatalog').innerHTML=minors.map(m=>`<span class="pill" style="margin:3px">${escapeHtml(m)}</span>`).join('');
+    if(state.education.level>=4){
+      window.postgradPrograms=[
+        {name:'Master of Science',years:2,tuition:18000,level:6,type:'Graduate School',school:'Graduate School Consortium'},
+        {name:'MBA',years:2,tuition:24000,level:5,type:'Business School',school:'Graduate Business School'},
+        {name:'Law School (J.D.)',years:3,tuition:32000,level:8,type:'Law School',school:'National Law School'},
+        {name:'Medical School + Residency',years:8,tuition:42000,level:8,type:'Medical School',school:'University Medical School'},
+        {name:'Dental School',years:4,tuition:38000,level:8,type:'Dental School',school:'University Dental School'},
+        {name:'PharmD',years:4,tuition:35000,level:8,type:'Pharmacy School',school:'College of Pharmacy'},
+        {name:'Veterinary Medicine',years:4,tuition:36000,level:8,type:'Veterinary School',school:'College of Veterinary Medicine'},
+        {name:'Doctorate / PhD',years:5,tuition:22000,level:7,type:'Doctoral Program',school:'Graduate Research University'}
+      ];
+      c.innerHTML+=`<hr class="sep"><h3>Postgraduate & Professional Programs</h3><div class="catalog" style="max-height:430px">${window.postgradPrograms.filter(p=>p.level>state.education.level).map(p=>{const idx=window.postgradPrograms.indexOf(p);return `<div class="item"><div><div class="item-title">${escapeHtml(p.name)}</div><div class="item-sub">${p.years} years • ${money(p.tuition)}/semester • requires bachelor degree</div></div><div class="item-meta"><button class="btn purple" onclick="startPostgraduate(postgradPrograms[${idx}])">Enroll</button></div></div>`}).join('')}</div>`;
+    }
+    return;
+  }
+  const semProgress=clamp(state.education.semesterHours/180*100,0,100);
+  c.innerHTML=`<div class="kpi"><div class="row"><span>School / program</span><strong>${escapeHtml(state.education.school)}</strong></div><div class="row"><span>Major</span><strong>${escapeHtml(state.education.major)}</strong></div><div class="row"><span>Minor</span><strong>${escapeHtml(state.education.minor||'None')}</strong></div><div class="row"><span>GPA</span><strong>${state.education.gpa.toFixed(2)}</strong></div><div class="row"><span>Semester</span><strong>${state.education.semester} / ${state.education.targetSemesters}</strong></div><div class="small muted" style="margin-top:8px">Attendance</div><div class="progress" style="margin-top:6px"><div class="bar purple" style="width:${semProgress}%"></div></div><div class="small muted" style="margin-top:6px">Classes run during weekday daytime hours. Work can overlap with school, but attendance only grows while you are actually in class hours.</div><div class="action-row"><button class="btn red" onclick="leaveCollege()">Leave Program</button></div></div>`;
+  document.getElementById('majorCatalog').innerHTML=`<div class="row"><span>Current major</span><strong>${escapeHtml(state.education.major)}</strong></div>`;
+  document.getElementById('minorCatalog').innerHTML=`<div class="row"><span>Current minor</span><strong>${escapeHtml(state.education.minor||'None')}</strong></div>`;
+}
+
+function renderBusinesses(){
+  const q=document.getElementById('bizSearch').value.trim().toLowerCase();const cat=document.getElementById('bizCategory').value;const sort=document.getElementById('bizSort').value;let arr=canonicalBusinesses.filter(b=>(!q||`${b.name} ${b.category} ${b.tier}`.toLowerCase().includes(q))&&(!cat||b.category===cat));const seen=new Set(arr.map(x=>x.id));for(let n=0;arr.length<130&&n<2600;n++){const x=generatedBusiness((n*104729)%Math.max(1,PROCEDURAL_BUSINESS_COUNT));if(seen.has(x.id))continue;if(q&&!`${x.name} ${x.category} ${x.tier}`.toLowerCase().includes(q))continue;if(cat&&x.category!==cat)continue;seen.add(x.id);arr.push(x)}
+  if(sort==='startup')arr.sort((a,b)=>a.startup-b.startup);if(sort==='profit')arr.sort((a,b)=>(b.revenue-b.cost)-(a.revenue-a.cost));if(sort==='roi')arr.sort((a,b)=>((b.revenue-b.cost)/b.startup)-((a.revenue-a.cost)/a.startup));if(sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name));if(sort==='tier'){const order={Micro:1,Local:2,Regional:3,National:4,Global:5};arr.sort((a,b)=>order[a.tier]-order[b.tier]||a.startup-b.startup)}
+  document.getElementById('bizCount').textContent=`Showing ${Math.min(arr.length,130)} results • ${fmtInt(PROCEDURAL_BUSINESS_COUNT)}+ procedural business possibilities.`;
+  document.getElementById('bizCatalog').innerHTML=arr.slice(0,130).map(b=>`<div class="item"><div><div class="item-title">${escapeHtml(b.name)}</div><div class="item-sub">${escapeHtml(b.category)} • ${escapeHtml(b.tier)} • Startup ${money(b.startup)} • Recommended reserves make real capital needs higher</div></div><div class="item-meta"><strong class="green-text">${money(Math.max(0,(b.revenue-b.cost)*(1+loc().revenueMod)))}/hr est.</strong><button class="btn primary" onclick="openBusiness(${JSON.stringify(b.id)})">Open</button></div></div>`).join('')||'<div class="empty">No businesses match that search.</div>'
+}
+function renderOwnedBusinesses(){const el=document.getElementById('ownedBusinesses');if(!state.businesses.length){el.innerHTML='<div class="empty">No businesses owned.</div>';return}el.innerHTML=state.businesses.map((b,i)=>{const profit=b.recentProfit||0;const upgrade=Math.round(b.startup*Math.pow(1.65,b.level)*.42);return `<div class="item"><div><div class="item-title">${escapeHtml(b.name)}</div><div class="item-sub">${escapeHtml(b.tier)} • Level ${b.level} • ${fmtInt(b.employees)} employees • Reputation ${b.reputation.toFixed(0)}%</div><div class="small muted" style="margin-top:7px">Value ${money(b.value)} • Revenue base ${money(b.revenue)}/hr • Payroll ${money(b.employees*b.employeeWage)}/hr • Fixed ${money(b.fixedCost)}/hr</div></div><div class="item-meta"><strong class="${profit>=0?'green-text':'red-text'}">${money(profit)}/hr</strong><button class="btn" onclick="upgradeBusiness(${JSON.stringify(b.id)})">Upgrade ${money(upgrade)}</button><button class="btn" style="margin-top:5px" onclick="hireEmployee(${JSON.stringify(b.id)})">Hire</button><button class="btn" style="margin-top:5px" onclick="fireEmployee(${JSON.stringify(b.id)})">Fire</button><button class="btn red" style="margin-top:5px" onclick="sellBusiness(${JSON.stringify(b.id)})">Sell</button></div></div>`}).join('')}
+function renderBusinessMetrics(){const profit=state.businesses.reduce((a,b)=>a+(b.recentProfit||0),0);const val=state.businesses.reduce((a,b)=>a+b.value,0);const employees=state.businesses.reduce((a,b)=>a+b.employees,0);document.getElementById('businessMetrics').innerHTML=`<div class="stat-line"><span>Businesses</span><strong>${state.businesses.length}</strong></div><div class="stat-line"><span>Portfolio value</span><strong>${money(val)}</strong></div><div class="stat-line"><span>Employees</span><strong>${fmtInt(employees)}</strong></div><div class="stat-line"><span>Latest hourly profit</span><strong class="green-text">${money(profit)}</strong></div><div class="stat-line"><span>Business profit lifetime</span><strong>${money(state.stats.businessProfit)}</strong></div>`}
+
+function renderAccounts(){document.getElementById('accounts').innerHTML=`<div class="row"><span>Cash</span><strong>${money(state.cash)}</strong></div><div class="row"><span>Checking</span><strong>${money(state.checking)}</strong></div><div class="row"><span>Savings</span><strong>${money(state.savings)} <span class="pill green">4% simulated APY</span></strong></div><div class="row"><span>Retirement</span><strong>${money(state.retirement)} <span class="pill purple">7% simulated</span></strong></div><div class="row"><span>Roth IRA</span><strong>${money(state.roth)} <span class="pill purple">8% simulated</span></strong></div><div class="row"><span>Debt</span><strong class="red-text">${money(debt())}</strong></div>`}
+function renderInvestments(){document.getElementById('investmentCard').innerHTML=`<div class="two-col"><div class="kpi"><div class="small muted">Traditional retirement</div><strong>${money(state.retirement)}</strong></div><div class="kpi"><div class="small muted">Roth IRA</div><strong>${money(state.roth)}</strong></div></div><div class="action-row"><div style="flex:1;min-width:180px"><input id="rothAmount" type="number" min="1" step="50" value="250"></div><button class="btn purple" onclick="contributeRoth()">Contribute to Roth</button></div><p class="small muted" style="margin-top:9px;line-height:1.5">Game mechanic: retirement accounts compound hourly. Early withdrawals are allowed in the simulation but may trigger penalties in future expansions.</p>`}
+function renderLoans(){const el=document.getElementById('loanCard');const loans=state.loans.map((l,i)=>`<div class="item"><div><div class="item-title">${escapeHtml(l.name)}</div><div class="item-sub">APR ${(l.apr*100).toFixed(1)}% • Minimum ${money(l.payment)} • Balance ${money(l.balance)}</div></div><div class="item-meta"><strong class="red-text">${money(l.balance)}</strong><button class="btn" onclick="manualLoanPayment(${i})">Pay</button></div></div>`).join('');el.innerHTML=`<div class="two-col"><div class="field"><label class="input-label">Loan amount</label><input id="loanAmount" type="number" min="1000" step="500" value="5000"></div><div style="display:flex;align-items:end"><button class="btn primary" onclick="takeLoan()">Borrow</button></div></div>${loans||'<div class="empty" style="margin-top:9px">No active loans.</div>'}`}
+function renderFinancialHealth(){const score=clamp(50+(state.creditScore-650)/5+(netWorth()>0?Math.min(25,Math.log10(Math.max(1,netWorth()))*3):0)-(debt()>liquid()?15:0),0,100);document.getElementById('financialHealth').innerHTML=`<div class="kpi"><div class="small muted">Financial health</div><strong>${score.toFixed(0)}/100</strong><div class="progress" style="margin-top:7px"><div class="bar green" style="width:${score}%"></div></div></div><div class="stat-line"><span>Liquid money</span><strong>${money(liquid())}</strong></div><div class="stat-line"><span>Total assets</span><strong>${money(assets())}</strong></div><div class="stat-line"><span>Total debt</span><strong class="red-text">${money(debt())}</strong></div><div class="stat-line"><span>Annualized base wages</span><strong>${money(hourlyWage()*2080)}</strong></div>`}
+function renderHousing(){const price=250000*loc().cost;document.getElementById('housingCard').innerHTML=`<div class="row"><span>Status</span><strong>${state.housing.type}</strong></div><div class="row"><span>Daily housing/lifestyle</span><strong>${money(state.housing.costPerDay)}</strong></div>${state.housing.type==='Own'?`<div class="row"><span>Home value</span><strong>${money(state.housing.homeValue)}</strong></div><div class="row"><span>Mortgage</span><strong class="red-text">${money(state.housing.mortgage)}</strong></div>`:`<div class="small muted" style="margin-top:8px">Simulated home price here: ${money(price)} • down payment: ${money(price*.2)}</div><div class="action-row"><button class="btn primary" onclick="buyHome()">Buy Home</button></div>`}`}
+function renderSkills(){const skills=Object.entries(state.skills).sort((a,b)=>b[1]-a[1]);document.getElementById('skillsCard').innerHTML=skills.map(([k,v])=>`<div class="row"><span>${escapeHtml(k.replace(/^[a-z]/,x=>x.toUpperCase()))}</span><strong>${v}</strong></div>`).join('')}
+function renderLocation(){const here=loc();document.getElementById('locationCard').innerHTML=`<div class="kpi"><div class="small muted">Current location</div><strong>${escapeHtml(here.name)}</strong><div class="small muted" style="margin-top:4px">${escapeHtml(here.description)}</div></div><div class="three-col" style="margin-top:9px"><div class="kpi"><div class="small muted">Personal income tax</div><strong>${(here.personalTax*100).toFixed(0)}%</strong></div><div class="kpi"><div class="small muted">Business tax</div><strong>${(here.businessTax*100).toFixed(0)}%</strong></div><div class="kpi"><div class="small muted">Business demand</div><strong>+${(here.revenueMod*100).toFixed(0)}%</strong></div></div><hr class="sep"><div class="catalog" style="max-height:420px">${locations.filter(x=>x.name!==state.location).map(x=>`<div class="item"><div><div class="item-title">${escapeHtml(x.name)}</div><div class="item-sub">Personal tax ${(x.personalTax*100).toFixed(0)}% • Business tax ${(x.businessTax*100).toFixed(0)}% • Demand +${(x.revenueMod*100).toFixed(0)}% • Housing ×${x.cost.toFixed(2)}</div></div><div class="item-meta"><strong>${money(x.moveCost*here.cost)}</strong><button class="btn" onclick="moveTo(${JSON.stringify(x.name)})">Move</button></div></div>`).join('')}</div>`}
+function renderLiving(){document.getElementById('livingCard').innerHTML=`<div class="row"><span>Housing</span><strong>${money(state.housing.costPerDay)}/day</strong></div><div class="row"><span>Food</span><strong>${money(20*loc().cost)}/day</strong></div><div class="row"><span>Utilities</span><strong>${money(8*loc().cost)}/day</strong></div><div class="row"><span>Transportation</span><strong>${money(8*loc().cost)}/day</strong></div><div class="row"><span>Business overhead</span><strong>${money(dailyBusinessFixedCosts())}/day</strong></div><div class="row"><span><strong>Total</strong></span><strong>${money(dailyExpenses())}/day</strong></div>`}
+function renderSettings(){document.getElementById('settingsCard').innerHTML=`<div class="row"><span>Random life events</span><button class="btn gold" onclick="toggleEvents()">${state.events?'On':'Off'}</button></div><div class="row"><span>Simulation date</span><strong>Year ${Math.floor((state.age-18))+1}</strong></div><div class="small muted" style="margin-top:8px;line-height:1.5">Start age is fixed at 18 with a high school diploma. The game progresses one hour per click. You can move, study, work, operate businesses, save, borrow and build a career without an artificial daily jump button.</div>`}
+function renderResume(){document.getElementById('resumePreview').innerHTML=resumeHtml()}
+function renderStatsCard(){document.getElementById('statsCard').innerHTML=`<div class="stat-line"><span>Total hours advanced</span><strong>${fmtInt(state.totalHours)}</strong></div><div class="stat-line"><span>Hours worked</span><strong>${fmtInt(state.stats.hoursWorked)}</strong></div><div class="stat-line"><span>Overtime hours</span><strong>${fmtInt(state.stats.overtimeHours)}</strong></div><div class="stat-line"><span>Gross wages</span><strong>${money(state.stats.wages)}</strong></div><div class="stat-line"><span>Business profit</span><strong>${money(state.stats.businessProfit)}</strong></div><div class="stat-line"><span>Taxes paid</span><strong>${money(state.stats.taxes)}</strong></div><div class="stat-line"><span>Interest earned</span><strong>${money(state.stats.interest)}</strong></div><div class="stat-line"><span>Promotions</span><strong>${fmtInt(state.stats.promotions)}</strong></div><div class="stat-line"><span>Businesses opened</span><strong>${fmtInt(state.stats.businessesOpened)}</strong></div><div class="stat-line"><span>Moves</span><strong>${fmtInt(state.stats.moves)}</strong></div><div class="stat-line"><span>Work Harder uses</span><strong>${fmtInt(state.stats.workHarder)}</strong></div>`}
+function renderAll(){renderStats();renderCurrentJob();renderLongProgress();renderHomeBusinesses();renderLogs();renderAchievements();renderCareerCard();renderWorkHarder();renderPromotionTrack();renderJobs();renderCollege();renderSchools();renderBusinesses();renderOwnedBusinesses();renderBusinessMetrics();renderAccounts();renderInvestments();renderLoans();renderFinancialHealth();renderHousing();renderSkills();renderLocation();renderLiving();renderSettings();renderResume();renderStatsCard()}
+
+function populateSelects(){document.getElementById('jobCategory').innerHTML='<option value="">All categories</option>'+jobCatalogCategories.sort().map(x=>`<option>${escapeHtml(x)}</option>`).join('');document.getElementById('bizCategory').innerHTML='<option value="">All categories</option>'+businessCategories.sort().map(x=>`<option>${escapeHtml(x)}</option>`).join('')}
+
+/* ------------------------------ SAVE ----------------------------------- */
+function normalizeState(){
+  const base=freshState();for(const k of Object.keys(base))if(state[k]===undefined)state[k]=base[k];
+  state.skills={...base.skills,...(state.skills||{})};state.stats={...base.stats,...(state.stats||{})};state.profile={...base.profile,...(state.profile||{})};state.education={...base.education,...(state.education||{})};state.housing={...base.housing,...(state.housing||{})};
+  if(!Array.isArray(state.businesses))state.businesses=[];if(!Array.isArray(state.loans))state.loans=[];if(!Array.isArray(state.log))state.log=[];if(!Array.isArray(state.achievements))state.achievements=[];
+  if(state.job&&!state.job.id)state.job=null;
+}
+function saveGame(silent=false){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));if(!silent)notify('Game saved to this browser.')}catch(e){notify('The browser blocked local saving. You can still keep playing this session.')}}
+function loadGame(){const raw=localStorage.getItem(SAVE_KEY);if(!raw){notify('No saved game found.');return}try{state=JSON.parse(raw);normalizeState();renderAll();notify('Saved game loaded.')}catch(e){notify('The save could not be loaded.')}}
+function resetGame(){if(!confirm('Reset your entire Business Simulator career?'))return;localStorage.removeItem(SAVE_KEY);location.reload()}
+
+/* ------------------------------ STARTUP -------------------------------- */
+populateSelects();
+loadGame();
+if(!localStorage.getItem(SAVE_KEY)){log('Welcome. You are 18, have a high school diploma, and start with $100.');log('Tip: college opens many careers, but owning businesses is capital-based and does not require a degree.');saveGame(true)}
+renderAll();
+
+</script>
+</body>
+</html>
